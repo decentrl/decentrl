@@ -1,0 +1,12 @@
+{
+  "name": "@decentrl/utils/web",
+  "version": "0.0.1",
+  "type": "commonjs",
+  "dependencies": {
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {},
+  "publishConfig": {
+    "access": "public"
+  }
+}

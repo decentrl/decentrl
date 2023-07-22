@@ -1,0 +1,13 @@
+{
+  "name": "@decentrl/utils/node",
+  "version": "0.0.1",
+  "type": "commonjs",
+  "dependencies": {
+    "uuid": "^9.0.0",
+    "jose": "^4.14.4"
+  },
+  "devDependencies": {},
+  "publishConfig": {
+    "access": "public"
+  }
+}
