@@ -60,7 +60,7 @@ describe('Did', () => {
      *
      * Node P256 key pair generators are used to generate the keys.
      * If you want to use browser P256 key pair generators, you can
-     * import them from @decentrl/utils/browser.
+     * import them from @decentrl/utils/web.
      */
     const did = await generateDid(
       'identity.decentrl.network',
