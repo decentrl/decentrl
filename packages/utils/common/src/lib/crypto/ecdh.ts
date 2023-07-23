@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { DIDResolutionResult } from 'did-resolver';
 import {
   DidDocumentVerificationMethodType,
@@ -36,10 +37,10 @@ export async function encryptPayload(
 }
 
 export async function decryptPayload(
+  privateJwk: jose.JWK,
   payload: string,
-  privateKeyJwk: jose.JWK
 ): Promise<string> {
-  const privateKey = await jose.importJWK(privateKeyJwk, 'ECDH-ES');
+  const privateKey = await jose.importJWK(privateJwk, 'ECDH-ES');
   const decryptionResult = await jose.compactDecrypt(payload, privateKey, {});
 
   return decryptionResult.plaintext.toString();
@@ -56,8 +57,8 @@ export async function decryptAndVerifyPayload(
     throw new Error('No kid in protected header');
   }
 
-  if (!decryptionResult.protectedHeader.jwk) {
-    throw new Error('No jwk in protected header');
+  if (!(decryptionResult.protectedHeader as any).epk) {
+    throw new Error('No epk in protected header');
   }
 
   const keyResolutionResult: KeyResolutionResult = await resolveKey(
@@ -73,11 +74,11 @@ export async function decryptAndVerifyPayload(
   const matchingPublicKey = verificationMethods.find(
     (verificationMethod) =>
       verificationMethod.publicKeyJwk.x ===
-        (decryptionResult.protectedHeader.jwk as jose.JWK).x &&
+        ((decryptionResult.protectedHeader as any).epk as jose.JWK).x &&
       verificationMethod.publicKeyJwk.crv ===
-        (decryptionResult.protectedHeader.jwk as jose.JWK).crv &&
+        ((decryptionResult.protectedHeader as any).epk as jose.JWK).crv &&
       verificationMethod.publicKeyJwk.kty ===
-        (decryptionResult.protectedHeader.jwk as jose.JWK).kty
+        ((decryptionResult.protectedHeader as any).epk as jose.JWK).kty
   );
 
   if (!matchingPublicKey) {

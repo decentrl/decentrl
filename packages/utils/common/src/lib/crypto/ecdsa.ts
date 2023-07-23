@@ -1,7 +1,24 @@
 import * as jose from 'jose';
 
+export async function readSignaturePayload<T extends Record<string, any>>(
+  signature: string
+): Promise<T> {
+  const payload = signature.split('.')[1];
+
+  return JSON.parse(Buffer.from(payload, 'base64').toString('utf-8')) as T;
+}
+
+export async function readSignatureHeaders<T extends Record<string, any>>(
+  signature: string
+): Promise<T> {
+  const payload = signature.split('.')[0];
+
+  return JSON.parse(Buffer.from(payload, 'base64').toString('utf-8')) as T;
+}
+
 export async function signPayload(
   privateKey: jose.JWK,
+  publicKeyId: string,
   payload: string | Uint8Array
 ): Promise<string> {
   if (privateKey.crv !== 'P-256') {
@@ -14,7 +31,7 @@ export async function signPayload(
     typeof payload === 'string' ? new TextEncoder().encode(payload) : payload;
 
   const signature = await new jose.CompactSign(dataBytes)
-    .setProtectedHeader({ alg: 'ES256' })
+    .setProtectedHeader({ alg: 'ES256', kid: publicKeyId })
     .sign(privateSigningKey);
 
   return signature;
@@ -22,6 +39,7 @@ export async function signPayload(
 
 export async function signJwt(
   privateKey: jose.JWK,
+  publicKeyId: string,
   payload: jose.JWTPayload
 ): Promise<string> {
   if (privateKey.crv !== 'P-256') {
@@ -31,7 +49,7 @@ export async function signJwt(
   const privateSigningKey = await jose.importJWK(privateKey, 'ES256');
 
   return new jose.SignJWT(payload)
-    .setProtectedHeader({ alg: 'ES256' })
+    .setProtectedHeader({ alg: 'ES256', kid: publicKeyId })
     .sign(privateSigningKey);
 }
 
