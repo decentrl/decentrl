@@ -174,3 +174,5 @@ describe('Did', () => {
     expect(JSON.parse(getUpdatedDidDocumentResponse.text)).toEqual(updatedDidDocument);
   });
 });
+
+// TODO: Add test case that checks if updated did document is a bad actor

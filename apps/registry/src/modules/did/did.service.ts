@@ -23,12 +23,10 @@ export class DidService {
   constructor(
     private identityWalletService: IdentityWalletService,
     private prismaService: PrismaService,
-    private configService: ConfigService,
+    private configService: ConfigService
   ) {}
 
-  private async validateDidDocumentSignature(
-    didDocumentSignature: string
-  ): Promise<DidDocument> {
+  private async extractDidDocument(didDocumentSignature: string) {
     const didDocument = await readSignaturePayload<DidDocument>(
       didDocumentSignature
     );
@@ -38,6 +36,15 @@ export class DidService {
     } catch {
       throw new BadRequestException('Invalid DID document');
     }
+
+    return didDocument;
+  }
+
+  private async validateDidDocumentSignature(
+    didDocumentSignature: string,
+    existingDidDocument?: DidDocument
+  ): Promise<DidDocument> {
+    const didDocument = await this.extractDidDocument(didDocumentSignature);
 
     const signatureHeaders = await readSignatureHeaders<{ kid?: string }>(
       didDocumentSignature
@@ -50,7 +57,7 @@ export class DidService {
     }
 
     const verificationMethod = getVerificationMethod(
-      didDocument,
+      existingDidDocument ? existingDidDocument : didDocument,
       signatureHeaders.kid
     );
 
@@ -99,8 +106,23 @@ export class DidService {
       encryptedDidDocument
     );
 
-    const didDocument = await this.validateDidDocumentSignature(
-      didDocumentSignature
+    const didDocument = await this.extractDidDocument(didDocumentSignature);
+
+    const existingDidDocument = await this.prismaService.didDocument.findUnique(
+      {
+        where: {
+          did: didDocument.id,
+        },
+      }
+    );
+
+    if (!existingDidDocument) {
+      throw new NotFoundException('DID not found');
+    }
+
+    await this.validateDidDocumentSignature(
+      didDocumentSignature,
+      JSON.parse(existingDidDocument.didDocument as string) as DidDocument
     );
 
     await this.prismaService.didDocument.update({
