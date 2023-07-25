@@ -1,8 +1,8 @@
 import { JWK } from 'jose';
 
 export interface DidKeyPair {
-  private: JWK;
-  public: JWK;
+  private: JWK & { kid: string };
+  public: JWK & { kid: string };
 }
 
 export interface DidData {

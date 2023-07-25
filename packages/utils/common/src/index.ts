@@ -10,3 +10,4 @@ export * from './lib/crypto/ecdh.interfaces';
 export * from './lib/crypto/ecdsa';
 export * from './lib/registry/registry.interfaces';
 export * from './lib/registry/registry';
+export * from './lib/mediator/mediator.interfaces';
