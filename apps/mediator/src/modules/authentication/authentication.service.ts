@@ -13,7 +13,7 @@ import {
   verifySignature,
 } from '@decentrl/ssi-utils';
 import { MediatorError } from '../errors/mediator.error';
-s
+
 @Injectable()
 export class AuthenticationService {
   constructor(private identityWalletService: IdentityWalletService) {}

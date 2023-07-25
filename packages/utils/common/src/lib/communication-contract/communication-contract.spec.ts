@@ -39,9 +39,7 @@ describe('Communication Contract', () => {
 
     recipientDidDocument =
       didDocumentUtils.generateDidDocument(recipientDidData);
-  });
 
-  it('should generate communication contract request and sign it', async () => {
     const webDidResolverSpy = jest.spyOn(
       didDocumentUtils,
       'resolveDidDocument'
@@ -54,7 +52,9 @@ describe('Communication Contract', () => {
     when(webDidResolverSpy)
       .calledWith(recipientDidData.did)
       .mockResolvedValue(recipientDidDocument);
+  });
 
+  it('should generate communication contract request and sign it', async () => {
     const signedCommunicationContractRequest =
       await generateCommunicationContractSignatureRequest(
         requestorDidData,
@@ -91,5 +91,42 @@ describe('Communication Contract', () => {
         requestorSignature: signedCommunicationContractRequest,
       },
     });
+  });
+
+  it('should fail communication contract request verification if it has expired', async () => {
+    const expiredCommunicationContractRequest =
+      await generateCommunicationContractSignatureRequest(
+        requestorDidData,
+        recipientDidData.did,
+        Date.now() / 1000 - 1
+      );
+
+    await expect(
+      verifyCommunicationContractSignatureRequest(
+        expiredCommunicationContractRequest
+      )
+    ).rejects.toThrowError(
+      'Communication contract request invalid: Contract has expired.'
+    );
+  });
+
+  it('should fail communication contract verification if it has expired', async () => {
+    const communicationContractRequest =
+      await generateCommunicationContractSignatureRequest(
+        requestorDidData,
+        recipientDidData.did
+      );
+
+    const expiredCommunicationContract = await signCommunicationContract(
+      communicationContractRequest,
+      recipientDidData,
+      Date.now() / 1000 - 1
+    );
+
+    await expect(
+      verifyCommunicationContract(expiredCommunicationContract)
+    ).rejects.toThrowError(
+      'Communication contract invalid: Contract has expired.'
+    );
   });
 });

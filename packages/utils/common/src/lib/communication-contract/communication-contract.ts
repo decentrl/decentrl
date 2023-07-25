@@ -19,7 +19,8 @@ import {
 
 export async function generateCommunicationContractSignatureRequest(
   requestorDidData: DidData,
-  recipientDid: string
+  recipientDid: string,
+  expiresAt?: number
 ): Promise<string> {
   const recipientDidDocument = await resolveDidDocument(recipientDid);
 
@@ -43,6 +44,7 @@ export async function generateCommunicationContractSignatureRequest(
     requestorPublicSigningKeyId,
     recipientDid,
     recipientPublicSigningKeyId,
+    contractExpiresAt: expiresAt,
   };
 
   const signedCommunicationContractRequest = await signPayload(
@@ -61,6 +63,15 @@ export async function verifyCommunicationContractSignatureRequest(
     await readSignaturePayload<CommunicationContractRequest>(
       signedCommunicationContractRequest
     );
+
+  if (
+    communicationContractRequest.contractExpiresAt &&
+    communicationContractRequest.contractExpiresAt < Date.now() / 1000
+  ) {
+    throw new Error(
+      `Communication contract request invalid: Contract has expired.`
+    );
+  }
 
   const requestorDidDocument = await resolveDidDocument(
     communicationContractRequest.requestorDid
@@ -96,7 +107,8 @@ export async function verifyCommunicationContractSignatureRequest(
 
 export async function signCommunicationContract(
   signedCommunicationContractRequest: string,
-  recipientDidData: DidData
+  recipientDidData: DidData,
+  expiresAt?: number
 ) {
   await verifyCommunicationContractSignatureRequest(
     signedCommunicationContractRequest
@@ -104,6 +116,7 @@ export async function signCommunicationContract(
 
   const communicationContract: CommunicationContract = {
     requestorSignature: signedCommunicationContractRequest,
+    contractExpiresAt: expiresAt,
   };
 
   const recipientPublicSigningKeyId = `${recipientDidData.did}#${recipientDidData.keys.signingKeyPair.public.kid}`;
@@ -124,6 +137,13 @@ export async function verifyCommunicationContract(
     await readSignaturePayload<CommunicationContract>(
       signedCommunicationContract
     );
+
+  if (
+    communicationContract.contractExpiresAt &&
+    communicationContract.contractExpiresAt < Date.now() / 1000
+  ) {
+    throw new Error(`Communication contract invalid: Contract has expired.`);
+  }
 
   const communicationContractRequestVerificationResult =
     await verifyCommunicationContractSignatureRequest(
