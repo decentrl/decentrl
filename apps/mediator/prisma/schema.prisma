@@ -1,0 +1,19 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum CommunicationChannel {
+  ONE_WAY_PUBLIC
+  TWO_WAY_PUBLIC
+  GROUP_PRIVATE
+}
+
+model RegisteredIdentities {
+  did                   String                 @id @unique
+  communicationChannels CommunicationChannel[]
+}

@@ -1,3 +1,4 @@
+import { DIDResolutionResult } from 'did-resolver';
 import { DidData } from '../did/did.interfaces';
 import { webDidResolver } from '../resolvers/web';
 import { DidDocumentBuilder } from './did-document-builder';
@@ -39,7 +40,7 @@ export function generateDidDocument(
     .validate();
 
   if (options.alias) {
-    didDocumentBuilder.setAlias(options.alias)
+    didDocumentBuilder.setAlias(options.alias);
   }
 
   if (options.service) {
@@ -60,12 +61,14 @@ export function addServiceEndpointToDidDocument(
     .build();
 }
 
-export async function resolveDidDocument(did: string): Promise<DidDocument> {
-  const { didDocument } = await webDidResolver.resolve(did);
+export async function resolveDidDocument(
+  did: string
+): Promise<DIDResolutionResult> {
+  const didResolutionResult = await webDidResolver.resolve(did);
 
-  if (!didDocument) {
+  if (!didResolutionResult.didDocument) {
     throw new Error(`Could not resolve DID document for DID ${did}`);
   }
 
-  return didDocument as unknown as DidDocument;
+  return didResolutionResult;
 }

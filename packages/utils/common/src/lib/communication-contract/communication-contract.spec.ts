@@ -47,11 +47,15 @@ describe('Communication Contract', () => {
 
     when(webDidResolverSpy)
       .calledWith(requestorDidData.did)
-      .mockResolvedValue(requestorDidDocument);
+      .mockResolvedValue({
+        didDocument: requestorDidDocument,
+      } as any);
 
     when(webDidResolverSpy)
       .calledWith(recipientDidData.did)
-      .mockResolvedValue(recipientDidDocument);
+      .mockResolvedValue({
+        didDocument: recipientDidDocument,
+      } as any);
   });
 
   it('should generate communication contract request and sign it', async () => {

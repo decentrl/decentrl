@@ -1,19 +1,19 @@
 import {
-  ConnectedSocket,
   MessageBody,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-// import {
-//   MediatorEventPayload,
-//   EncryptedMediatorCommandPayload,
-// } from '@decentrl/ssi-utils';
 import { OnModuleInit } from '@nestjs/common';
 import { Server } from 'ws';
 import { v4 } from 'uuid';
 import { WebSocketExtended } from './websocket.interfaces';
 import { WebsocketService } from './websocket.service';
+import {
+  MediatorCommand,
+  MediatorErrorEvent,
+  MediatorEvent,
+} from '@decentrl/utils/common';
 
 @WebSocketGateway()
 export class WebsocketGateway implements OnModuleInit {
@@ -58,11 +58,10 @@ export class WebsocketGateway implements OnModuleInit {
     return this.server;
   }
 
-  // @SubscribeMessage('COMMAND')
-  // async commandHandler(
-  //   @MessageBody() body: EncryptedMediatorCommandPayload,
-  //   @ConnectedSocket() client: WebSocketExtended
-  // ): Promise<MediatorEventPayload | void> {
-  //   // return this.websocketService.commandHandler(body, client, this.server);
-  // }
+  @SubscribeMessage('COMMAND')
+  async commandHandler(
+    @MessageBody() body: MediatorCommand
+  ): Promise<MediatorEvent | MediatorErrorEvent | void> {
+    return await this.websocketService.commandHandler(body);
+  }
 }

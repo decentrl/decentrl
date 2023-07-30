@@ -12,6 +12,8 @@ import {
 } from './ecdh.interfaces';
 import * as jose from 'jose';
 
+export type DidResolver = (did: string) => Promise<DIDResolutionResult>;
+
 export async function encryptPayload(
   payload: string,
   privateKeyJwk: jose.JWK,
@@ -38,7 +40,7 @@ export async function encryptPayload(
 
 export async function decryptPayload(
   privateJwk: jose.JWK,
-  payload: string,
+  payload: string
 ): Promise<string> {
   const privateKey = await jose.importJWK(privateJwk, 'ECDH-ES');
   const decryptionResult = await jose.compactDecrypt(payload, privateKey, {});
@@ -48,7 +50,8 @@ export async function decryptPayload(
 
 export async function decryptAndVerifyPayload(
   payload: string,
-  privateKeyJwk: jose.JWK
+  privateKeyJwk: jose.JWK,
+  resolver?: DidResolver
 ): Promise<DecryptAndVerifyPayloadResult> {
   const privateKey = await jose.importJWK(privateKeyJwk, 'ECDH-ES');
   const decryptionResult = await jose.compactDecrypt(payload, privateKey, {});
@@ -62,7 +65,8 @@ export async function decryptAndVerifyPayload(
   }
 
   const keyResolutionResult: KeyResolutionResult = await resolveKey(
-    decryptionResult.protectedHeader.kid
+    decryptionResult.protectedHeader.kid,
+    resolver
   );
 
   const verificationMethods = getVerificationMethods(
@@ -91,10 +95,13 @@ export async function decryptAndVerifyPayload(
   };
 }
 
-export async function resolveKey(kid: string): Promise<KeyResolutionResult> {
-  const didResolutionResult: DIDResolutionResult = await webDidResolver.resolve(
-    kid
-  );
+export async function resolveKey(
+  kid: string,
+  resolver?: DidResolver
+): Promise<KeyResolutionResult> {
+  const didResolutionResult: DIDResolutionResult = await (resolver
+    ? resolver(kid)
+    : webDidResolver.resolve(kid));
 
   const keyAgreementVerificationMethods = getVerificationMethods(
     didResolutionResult.didDocument as unknown as DidDocument,

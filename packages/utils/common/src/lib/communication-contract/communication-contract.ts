@@ -4,7 +4,10 @@ import {
   verifySignature,
 } from '../crypto/ecdsa';
 import { resolveDidDocument } from '../did-document/did-document';
-import { DidDocumentVerificationMethodType } from '../did-document/did-document.interfaces';
+import {
+  DidDocument,
+  DidDocumentVerificationMethodType,
+} from '../did-document/did-document.interfaces';
 import {
   getKey,
   getVerificationMethods,
@@ -22,7 +25,9 @@ export async function generateCommunicationContractSignatureRequest(
   recipientDid: string,
   expiresAt?: number
 ): Promise<string> {
-  const recipientDidDocument = await resolveDidDocument(recipientDid);
+  const recipientDidResolutionResult = await resolveDidDocument(recipientDid);
+  const recipientDidDocument =
+    recipientDidResolutionResult.didDocument as DidDocument;
 
   const verificationMethods = getVerificationMethods(
     recipientDidDocument,
@@ -73,9 +78,12 @@ export async function verifyCommunicationContractSignatureRequest(
     );
   }
 
-  const requestorDidDocument = await resolveDidDocument(
+  const requestorDidResolutionResult = await resolveDidDocument(
     communicationContractRequest.requestorDid
   );
+
+  const requestorDidDocument =
+    requestorDidResolutionResult.didDocument as DidDocument;
 
   const requestorPublicSigningKey = getKey(
     requestorDidDocument,
@@ -150,10 +158,12 @@ export async function verifyCommunicationContract(
       communicationContract.requestorSignature
     );
 
-  const recipientDidDocument = await resolveDidDocument(
+  const recipientDidResolutionResult = await resolveDidDocument(
     communicationContractRequestVerificationResult.communicationContractRequest
       .recipientDid
   );
+  const recipientDidDocument =
+    recipientDidResolutionResult.didDocument as DidDocument;
 
   const recipientPublicSigningKey = getKey(
     recipientDidDocument,

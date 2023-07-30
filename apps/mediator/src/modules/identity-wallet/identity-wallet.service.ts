@@ -4,8 +4,10 @@ import {
   DidDocument,
   DidDocumentBuilder,
   DidDocumentVerificationMethodType,
-  MediatorFeature,
-  MediatorService,
+  MediatorCommunicationChannel,
+  MediatorCommunicationService,
+  MediatorRegisterService,
+  MediatorServiceType,
 } from '@decentrl/utils/common';
 import { Injectable } from '@nestjs/common';
 import { ConfigVariables } from '../../constants';
@@ -24,15 +26,25 @@ export class IdentityWalletService {
     const did = `did:web:${domain}`;
     const keyAgreementX25519JwkId = `${did}#key-ECDH-1`;
 
-    const mediatorService: MediatorService = {
-      id: `${did}#mediator`,
-      type: 'DecentrlMediator',
+    const mediatorRegisterService: MediatorRegisterService = {
+      id: `${did}#mediatorRegister`,
+      type: `DecentrlMediator${MediatorServiceType.REGISTER}`,
       serviceEndpoint: {
-        uri: `https://${domain}/`,
+        uri: `ws://${domain}/`,
         routingKeys: [keyAgreementX25519JwkId],
-        features: [
-          MediatorFeature.CHALLENGE_AUTHENTICATION,
-          MediatorFeature.TOKEN_AUTHENTICATION,
+      },
+    };
+
+    const mediatorCommunicationService: MediatorCommunicationService = {
+      id: `${did}#mediatorCommunication`,
+      type: `DecentrlMediator${MediatorServiceType.COMMUNICATION}`,
+      serviceEndpoint: {
+        uri: `ws://${domain}/`,
+        routingKeys: [keyAgreementX25519JwkId],
+        communicationChannels: [
+          MediatorCommunicationChannel.ONE_WAY_PUBLIC,
+          MediatorCommunicationChannel.TWO_WAY_PRIVATE,
+          MediatorCommunicationChannel.GROUP_PRIVATE,
         ],
       },
     };
@@ -45,7 +57,8 @@ export class IdentityWalletService {
         publicKeyJwk: keyAgreementX25519Jwk,
         controller: did,
       })
-      .addServiceEndpoint(mediatorService)
+      .addServiceEndpoint(mediatorRegisterService)
+      .addServiceEndpoint(mediatorCommunicationService)
       .build();
   }
 
