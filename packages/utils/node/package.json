@@ -1,5 +1,14 @@
 {
-  "name": "@decentrl/utils/node",
+  "name": "@decentrl/utils-node",
+  "keyword": "decentrl node utils did",
+  "description": "Decentrl node utils library",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/decentrl/decentrl/tree/main/packages/utils/node"
+  },
+  "author": {
+    "name": "Decentrl Org"
+  },
   "version": "0.0.1",
   "type": "commonjs",
   "dependencies": {

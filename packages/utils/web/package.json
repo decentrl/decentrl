@@ -1,5 +1,14 @@
 {
-  "name": "@decentrl/utils/web",
+  "name": "@decentrl/utils-web",
+  "keyword": "decentrl web utils did",
+  "description": "Decentrl web utils library",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/decentrl/decentrl/tree/main/packages/utils/web"
+  },
+  "author": {
+    "name": "Decentrl Org"
+  },
   "version": "0.0.1",
   "type": "commonjs",
   "dependencies": {
