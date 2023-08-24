@@ -1,19 +1,22 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import {
   DidDocument,
   DidDocumentVerificationMethodType,
   MediatorCommand,
   MediatorCommandPayload,
   MediatorCommandType,
+  MediatorCommunicationChannel,
   MediatorErrorEvent,
   MediatorErrorReason,
   MediatorEvent,
   MediatorEventPayload,
   MediatorMessageType,
+  MediatorOneWayPublicCommandPayload,
   MediatorQueryCommandPayload,
   MediatorRegisterCommandPayload,
   MediatorRequestCommunicationContractCommandPayload,
   MediatorSignCommunicationContractCommandPayload,
+  MediatorTwoWayPrivateCommandPayload,
   encryptPayload,
   getVerificationMethods,
 } from '@decentrl/utils/common';
@@ -26,6 +29,8 @@ import { IdentityWalletService } from '../identity-wallet/identity-wallet.servic
 import { VerificationMethod } from 'did-resolver';
 import { CommunicationContractService } from '../communication-contract/communication-contract.service';
 import { EventLogService } from '../event-log/event-log.service';
+import { OneWayPublicService } from '../one-way-public/one-way-public.service';
+import { TwoWayPrivateService } from '../two-way-private/two-way-private.service';
 
 @Injectable()
 export class WebsocketService {
@@ -35,7 +40,9 @@ export class WebsocketService {
     private communicationContractService: CommunicationContractService,
     private eventLogService: EventLogService,
     private configService: ConfigService,
-    private identityWalletService: IdentityWalletService
+    private identityWalletService: IdentityWalletService,
+    private oneWayPublicService: OneWayPublicService,
+    private twoWayPrivateService: TwoWayPrivateService
   ) {}
 
   async processCommand(
@@ -68,6 +75,26 @@ export class WebsocketService {
               commandPayload as MediatorSignCommunicationContractCommandPayload,
           }
         );
+      case MediatorCommandType.MESSAGE:
+        switch (commandPayload.communicationChannel) {
+          case MediatorCommunicationChannel.ONE_WAY_PUBLIC:
+            return await this.oneWayPublicService.postOneWayPublicMessage(
+              command,
+              {
+                didDocument: senderDidDocument,
+                command: commandPayload as MediatorOneWayPublicCommandPayload,
+              }
+            );
+          case MediatorCommunicationChannel.TWO_WAY_PRIVATE:
+            return await this.twoWayPrivateService.postTwoWayPrivateMessage(
+              command,
+              {
+                didDocument: senderDidDocument,
+                command: commandPayload as MediatorTwoWayPrivateCommandPayload,
+              }
+            );
+        }
+        break;
       case MediatorCommandType.QUERY:
         return await this.eventLogService.query({
           didDocument: senderDidDocument,

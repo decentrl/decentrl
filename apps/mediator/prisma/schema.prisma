@@ -10,7 +10,7 @@ datasource db {
 
 enum CommunicationChannel {
   ONE_WAY_PUBLIC
-  TWO_WAY_PUBLIC
+  TWO_WAY_PRIVATE
   GROUP_PRIVATE
 }
 
@@ -22,6 +22,7 @@ model RegisteredIdentities {
 model EventLog {
   id        String   @id @default(uuid())
   name      String
+  communicationChannel CommunicationChannel?
   sender    String
   receiver  String?
   payload   Json

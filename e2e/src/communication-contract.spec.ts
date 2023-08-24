@@ -3,10 +3,14 @@ import * as nodeUtils from '@decentrl/utils/node';
 import {
   DidDocumentBuilder,
   MediatorCommandType,
+  MediatorCommunicationChannel,
   MediatorEventType,
   MediatorQueryCommandPayload,
   MediatorRequestCommunicationContractCommandPayload,
   MediatorSignCommunicationContractCommandPayload,
+  MediatorTwoWayPrivateCommandPayload,
+  decryptTwoWayPrivateMessage,
+  encryptTwoWayPrivateMessage,
   generateCommunicationContractSignatureRequest,
   generateMediatorCommand,
   signCommunicationContract,
@@ -52,8 +56,6 @@ describe('Register on mediator', () => {
   let registryIdentityWalletService: RegistryIdentityWalletService;
 
   beforeAll(async () => {
-    jest.setTimeout(100000);
-
     mediatorApplication = await createNestApplication(
       MediatorAppModule,
       process.env.MEDIATOR_PORT as any
@@ -281,6 +283,82 @@ describe('Register on mediator', () => {
     await verifyCommunicationContract(
       mediatorResponse.payload[0].payload.contract
     );
+  });
+
+  it('identity one should send a private message to the identity two', async () => {
+    const encryptedMessage: string = await encryptTwoWayPrivateMessage(
+      identityOne[0], // Did Data
+      identityTwo[1], // Did Document
+      {
+        message: 'Hello from identity one',
+      }
+    );
+
+    const sendTwoWayPrivateMessageCommandPayload =
+      await generateMediatorCommand<MediatorTwoWayPrivateCommandPayload>(
+        {
+          name: MediatorCommandType.MESSAGE,
+          communicationChannel: MediatorCommunicationChannel.TWO_WAY_PRIVATE,
+          recipient: identityTwo[0].did,
+          payload: {
+            message: encryptedMessage,
+            signedCommunicationContract,
+          },
+        },
+        identityOne[0],
+        mediatorDidDocument
+      );
+
+    websocketClient.send(
+      JSON.stringify({
+        type: 'COMMAND',
+        data: sendTwoWayPrivateMessageCommandPayload,
+      })
+    );
+
+    const mediatorResponse: any = await listenToMediatorEvent(
+      identityOne[0],
+      websocketClient
+    );
+
+    console.log(mediatorResponse);
+  });
+
+  it('identity two should query mediator for private messages', async () => {
+    const queryTwoWayMessageCommandPayload =
+      await generateMediatorCommand<MediatorQueryCommandPayload>(
+        {
+          name: MediatorCommandType.QUERY,
+          payload: {
+            command: MediatorCommandType.MESSAGE,
+          },
+        },
+        identityTwo[0],
+        mediatorDidDocument
+      );
+
+    websocketClient.send(
+      JSON.stringify({
+        type: 'COMMAND',
+        data: queryTwoWayMessageCommandPayload,
+      })
+    );
+
+    const mediatorResponse: any = await listenToMediatorEvent(
+      identityTwo[0],
+      websocketClient
+    );
+
+    console.log(mediatorResponse);
+
+    const message = await decryptTwoWayPrivateMessage(
+      identityTwo[0],
+      mediatorResponse.payload[0].payload.message
+    );
+
+    expect(message).toStrictEqual({
+      message: 'Hello from identity one',
+    });
   });
 
   afterAll(async () => {

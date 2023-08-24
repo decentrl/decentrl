@@ -14,3 +14,4 @@ export * from './lib/mediator/mediator.interfaces';
 export * from './lib/mediator/mediator';
 export * from './lib/communication-contract/communication-contract.interfaces';
 export * from './lib/communication-contract/communication-contract';
+export * from './lib/communication-channels/two-way-public';

@@ -1,8 +1,3 @@
-import {
-  CommunicationContract,
-  CommunicationContractRequest,
-} from '../communication-contract/communication-contract.interfaces';
-
 export enum MediatorCommunicationChannel {
   ONE_WAY_PUBLIC = 'ONE_WAY_PUBLIC',
   TWO_WAY_PRIVATE = 'TWO_WAY_PRIVATE',
@@ -67,6 +62,7 @@ export enum MediatorErrorReason {
   MESSAGE_UNWRAPPING_FAILED = 'MESSAGE_UNWRAPPING_FAILED',
   RESPONSE_ENCRYPTION_FAILED = 'RESPONSE_ENCRYPTION_FAILED',
   NOT_REGISTERED = 'NOT_REGISTERED',
+  COMMUNICATION_CONTRACT_NOT_VALID = 'COMMUNICATION_CONTRACT_NOT_VALID',
 }
 
 export interface MediatorErrorEvent {
@@ -89,6 +85,9 @@ export enum MediatorEventType {
   COMMUNICATION_CONTRACT_SIGNED = 'COMMUNICATION_CONTRACT_SIGNED',
   // Query
   QUERY_EXECUTED = 'QUERY_EXECUTED',
+  // Messaging
+  ONE_WAY_PUBLIC_MESSAGE_SENT = 'ONE_WAY_PUBLIC_MESSAGE_SENT',
+  TWO_WAY_PRIVATE_MESSAGE_SENT = 'TWO_WAY_PRIVATE_MESSAGE_SENT',
 }
 
 export interface MediatorEventPayload {
@@ -107,12 +106,14 @@ export enum MediatorCommandType {
   REGISTER = 'REGISTER',
   REQUEST_COMMUNICATION_CONTRACT = 'REQUEST_COMMUNICATION_CONTRACT',
   SIGN_COMMUNICATION_CONTACT = 'SIGN_COMMUNICATION_CONTACT',
+  MESSAGE = 'MESSAGE',
   QUERY = 'QUERY',
 }
 
 export interface MediatorCommandPayload {
   name: MediatorCommandType;
   recipient?: string;
+  communicationChannel?: MediatorCommunicationChannel;
   payload: Record<string, any>;
   metadata?: Record<string, any>;
 }
@@ -203,6 +204,37 @@ export interface SignCommunicationContractPayload {
 
 export interface MediatorCommunicationContractSignedEventPayload {
   name: MediatorEventType.COMMUNICATION_CONTRACT_SIGNED;
+}
+
+/**
+ * Communication
+ */
+export interface MediatorCommunicationCommandPayload {
+  name: MediatorCommandType.MESSAGE;
+  communicationChannel: MediatorCommunicationChannel;
+}
+
+/**
+ * One way public communication
+ */
+export interface MediatorOneWayPublicCommandPayload extends MediatorCommunicationCommandPayload {
+  communicationChannel: MediatorCommunicationChannel.ONE_WAY_PUBLIC;
+  payload: Record<string, any>;
+}
+
+/**
+ * Two way private communication
+ */
+export interface MediatorTwoWayPrivateCommandPayload extends MediatorCommunicationCommandPayload {
+  communicationChannel: MediatorCommunicationChannel.TWO_WAY_PRIVATE;
+  recipient: string;
+  payload: TwoWayPrivateCommandPayload;
+  metadata?: Record<string, any>;
+}
+
+export interface TwoWayPrivateCommandPayload {
+  signedCommunicationContract: string;
+  message: string;
 }
 
 // export type MediatorCommandGenerator = <
