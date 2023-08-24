@@ -12,3 +12,5 @@ export * from './lib/registry/registry.interfaces';
 export * from './lib/registry/registry';
 export * from './lib/mediator/mediator.interfaces';
 export * from './lib/mediator/mediator';
+export * from './lib/communication-contract/communication-contract.interfaces';
+export * from './lib/communication-contract/communication-contract';

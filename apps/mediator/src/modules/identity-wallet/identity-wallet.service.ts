@@ -5,6 +5,7 @@ import {
   DidDocumentBuilder,
   DidDocumentVerificationMethodType,
   MediatorCommunicationChannel,
+  MediatorCommunicationContractService,
   MediatorCommunicationService,
   MediatorRegisterService,
   MediatorServiceType,
@@ -35,6 +36,16 @@ export class IdentityWalletService {
       },
     };
 
+    const MediatorCommunicationContractService: MediatorCommunicationContractService =
+      {
+        id: `${did}#mediatorCommunicationContract`,
+        type: `DecentrlMediator${MediatorServiceType.COMMUNICATION_CONTRACT}`,
+        serviceEndpoint: {
+          uri: `ws://${domain}/`,
+          routingKeys: [keyAgreementX25519JwkId],
+        },
+      };
+
     const mediatorCommunicationService: MediatorCommunicationService = {
       id: `${did}#mediatorCommunication`,
       type: `DecentrlMediator${MediatorServiceType.COMMUNICATION}`,
@@ -58,6 +69,7 @@ export class IdentityWalletService {
         controller: did,
       })
       .addServiceEndpoint(mediatorRegisterService)
+      .addServiceEndpoint(MediatorCommunicationContractService)
       .addServiceEndpoint(mediatorCommunicationService)
       .build();
   }

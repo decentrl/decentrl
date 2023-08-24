@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common';
 import { IdentityService } from './identity.service';
-import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
-  imports: [CacheModule.register()],
+  imports: [],
   providers: [IdentityService],
   exports: [IdentityService],
 })

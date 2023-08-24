@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { InternalMediatorCommand } from '../../interfaces';
 import {
   MediatorCommunicationChannel,
+  MediatorErrorReason,
   MediatorEventPayload,
   MediatorEventType,
   MediatorRegisterCommandPayload,
@@ -10,6 +11,7 @@ import {
 } from '@decentrl/utils/common';
 import { IdentityWalletService } from '../identity-wallet/identity-wallet.service';
 import { CommunicationChannel } from '@prisma/client';
+import { MediatorError } from '../../errors/mediator.error';
 
 @Injectable()
 export class RegisterService {
@@ -33,12 +35,9 @@ export class RegisterService {
       );
 
     if (enabledCommunicationChannels.length === 0) {
-      return {
-        name: MediatorEventType.REGISTER_FAILED,
-        payload: {
-          reason: 'No enabled communication channels.',
-        },
-      };
+      throw new MediatorError(
+        MediatorErrorReason.NO_ENABLED_COMMUNICATION_CHANNELS
+      );
     }
 
     await this.prismaService.registeredIdentities.create({
@@ -55,6 +54,17 @@ export class RegisterService {
         communicationChannels: enabledCommunicationChannels,
       },
     };
+  }
+
+  async isRegistered(did: string): Promise<boolean> {
+    const registeredIdentity =
+      await this.prismaService.registeredIdentities.findUnique({
+        where: {
+          did,
+        },
+      });
+
+    return !!registeredIdentity;
   }
 
   async communicationChannelEnabled(

@@ -7,6 +7,8 @@ export interface CommunicationContractRequest {
   recipientDid: string;
   recipientPublicSigningKeyId: string;
 
+  recipientEncryptedCommunicationSecretKey: string;
+
   contractExpiresAt?: number;
 }
 
@@ -17,11 +19,14 @@ export interface CommunicationContractRequestVerificationResult {
 
 export interface CommunicationContract {
   requestorSignature: string;
+  requestorEncryptedCommunicationSecretKey: string;
   contractExpiresAt?: number;
 }
 
 export interface CommunicationContractVerificationResult {
   requestorDidDocument: DidDocument;
   recipientDidDocument: DidDocument;
+  recipientEncryptedCommunicationSecretKey: string;
+  requestorEncryptedCommunicationSecretKey: string;
   communicationContract: CommunicationContract;
 }

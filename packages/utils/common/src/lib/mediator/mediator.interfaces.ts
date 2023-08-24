@@ -1,5 +1,7 @@
-import { DidDocument } from '../did-document/did-document.interfaces';
-import { DidData } from '../did/did.interfaces';
+import {
+  CommunicationContract,
+  CommunicationContractRequest,
+} from '../communication-contract/communication-contract.interfaces';
 
 export enum MediatorCommunicationChannel {
   ONE_WAY_PUBLIC = 'ONE_WAY_PUBLIC',
@@ -9,6 +11,7 @@ export enum MediatorCommunicationChannel {
 
 export enum MediatorServiceType {
   REGISTER = 'Register',
+  COMMUNICATION_CONTRACT = 'CommunicationContract',
   COMMUNICATION = 'Communication',
   BACKLIST = 'Blacklist',
   DISCOVERY = 'Discovery',
@@ -38,6 +41,12 @@ export interface MediatorRegisterService {
   serviceEndpoint: MediatorServiceEndpoint;
 }
 
+export interface MediatorCommunicationContractService {
+  id: string;
+  type: `DecentrlMediator${MediatorServiceType.COMMUNICATION_CONTRACT}`;
+  serviceEndpoint: MediatorServiceEndpoint;
+}
+
 export interface MediatorCommunicationService {
   id: string;
   type: `DecentrlMediator${MediatorServiceType.COMMUNICATION}`;
@@ -51,6 +60,9 @@ export enum MediatorMessageType {
 }
 
 export enum MediatorErrorReason {
+  NO_ENABLED_COMMUNICATION_CHANNELS = 'NO_ENABLED_COMMUNICATION_CHANNELS',
+  RECIPIENT_NOT_REGISTERED = 'RECIPIENT_NOT_REGISTERED',
+  ENCRYPTED_PAYLOAD_MISSING = 'ENCRYPTED_PAYLOAD_MISSING',
   DID_RESOLUTION_FAILED = 'DID_RESOLUTION_FAILED',
   MESSAGE_UNWRAPPING_FAILED = 'MESSAGE_UNWRAPPING_FAILED',
   RESPONSE_ENCRYPTION_FAILED = 'RESPONSE_ENCRYPTION_FAILED',
@@ -70,13 +82,18 @@ export interface MediatorEvent {
 }
 
 export enum MediatorEventType {
+  // Registration
   REGISTERED = 'REGISTERED',
-  REGISTER_FAILED = 'REGISTER_FAILED',
+  // Communication contract signing
+  COMMUNICATION_CONTRACT_REQUESTED = 'COMMUNICATION_CONTRACT_REQUESTED',
+  COMMUNICATION_CONTRACT_SIGNED = 'COMMUNICATION_CONTRACT_SIGNED',
+  // Query
+  QUERY_EXECUTED = 'QUERY_EXECUTED',
 }
 
 export interface MediatorEventPayload {
   name: MediatorEventType;
-  payload: unknown;
+  payload?: unknown;
 }
 
 export interface MediatorCommand {
@@ -88,11 +105,56 @@ export interface MediatorCommand {
 
 export enum MediatorCommandType {
   REGISTER = 'REGISTER',
+  REQUEST_COMMUNICATION_CONTRACT = 'REQUEST_COMMUNICATION_CONTRACT',
+  SIGN_COMMUNICATION_CONTACT = 'SIGN_COMMUNICATION_CONTACT',
+  QUERY = 'QUERY',
 }
 
 export interface MediatorCommandPayload {
   name: MediatorCommandType;
-  payload: any;
+  recipient?: string;
+  payload: Record<string, any>;
+  metadata?: Record<string, any>;
+}
+
+export interface MediatorQueryFilters {
+  sender?: string;
+  receiver?: string;
+
+  command?: string
+
+  metadata?: Record<string, any>;
+
+  gte?: string;
+  lte?: string;
+
+  offset?: number;
+  limit?: number;
+
+  orderBy?: 'asc' | 'desc';
+}
+
+/**
+ * Query
+ */
+export interface MediatorQueryCommandPayload {
+  name: MediatorCommandType.QUERY;
+  payload: MediatorQueryFilters;
+}
+
+export interface EventLog {
+  id: string;
+  name: string;
+  sender: string;
+  recipient?: string;
+  payload: Record<string, any>;
+  metadata: Record<string, any>;
+  createdAt: string;
+}
+
+export interface MediatorQueryEventPayload {
+  name: MediatorEventType.QUERY_EXECUTED;
+  payload: EventLog[];
 }
 
 /**
@@ -112,11 +174,35 @@ export interface MediatorRegisteredEventPayload {
   };
 }
 
-export interface MediatorRegisterFailedEventPayload {
-  name: MediatorEventType.REGISTER_FAILED;
-  payload: {
-    reason: string;
-  };
+/**
+ * Communication contract
+ */
+export interface MediatorRequestCommunicationContractCommandPayload {
+  name: MediatorCommandType.REQUEST_COMMUNICATION_CONTRACT;
+  recipient: string;
+  payload: RequestCommunicationContractPayload;
+}
+
+export interface RequestCommunicationContractPayload {
+  contract: string;
+}
+
+export interface MediatorCommunicationContractRequestedEventPayload {
+  name: MediatorEventType.COMMUNICATION_CONTRACT_REQUESTED;
+}
+
+export interface MediatorSignCommunicationContractCommandPayload {
+  name: MediatorCommandType.SIGN_COMMUNICATION_CONTACT;
+  recipient: string;
+  payload: SignCommunicationContractPayload;
+}
+
+export interface SignCommunicationContractPayload {
+  contract: string;
+}
+
+export interface MediatorCommunicationContractSignedEventPayload {
+  name: MediatorEventType.COMMUNICATION_CONTRACT_SIGNED;
 }
 
 // export type MediatorCommandGenerator = <
@@ -220,6 +306,10 @@ export interface MediatorRegisterFailedEventPayload {
  * client can then register did on a different registry (which will mean that the client will have a different resolvable did) but
  * recovered data can be hydrated on new dids mediators. This enables clients to change registries without losing their data BUT THEY
  * WILL LOSE ALL COMMUNICATION CONTRACTS.
+ *
+ * Communication contracts should be registered on the mediators
+ *
+ * possible mediator token for communicating with identity ? this would enable mediator to only check communication contracts when token does not exist
  * - -
  * ---- Mediator metadata anonymization ----
  * Two identities communicating with each other via mediator can anonymize their metadata using a secret key that was shared
