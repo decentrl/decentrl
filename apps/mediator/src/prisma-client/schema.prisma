@@ -1,0 +1,30 @@
+generator client {
+  provider = "prisma-client-js"
+  output = "../src/prisma-client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("MEDIATOR_DATABASE_URL")
+}
+
+enum CommunicationChannel {
+  ONE_WAY_PUBLIC
+  TWO_WAY_PUBLIC
+  GROUP_PRIVATE
+}
+
+model RegisteredIdentities {
+  did                   String                 @id @unique
+  communicationChannels CommunicationChannel[]
+}
+
+model EventLog {
+  id        String   @id @default(uuid())
+  name      String
+  sender    String
+  receiver  String?
+  payload   Json
+  createdAt DateTime @default(now())
+  metadata  Json?
+}

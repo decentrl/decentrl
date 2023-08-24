@@ -10,7 +10,7 @@ export async function generateDid(
   const signingKeyPair = await signingKeyPairGenerator();
 
   return {
-    did: `did:web:${domain}:${v4()}`,
+    did: `did:web:${domain.replace(':', '%3A')}:${v4()}`,
     keys: {
       signingKeyPair: {
         private: signingKeyPair.private,

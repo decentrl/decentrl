@@ -19,10 +19,12 @@ import {
   CommunicationContractRequestVerificationResult,
   CommunicationContractVerificationResult,
 } from './communication-contract.interfaces';
+import { decryptPayload, encryptPayload } from '../crypto/ecdh';
 
 export async function generateCommunicationContractSignatureRequest(
   requestorDidData: DidData,
   recipientDid: string,
+  secretContractKey: string,
   expiresAt?: number
 ): Promise<string> {
   const recipientDidResolutionResult = await resolveDidDocument(recipientDid);
@@ -41,8 +43,27 @@ export async function generateCommunicationContractSignatureRequest(
     );
   }
 
+  const keyAgreements = getVerificationMethods(
+    recipientDidDocument,
+    'keyAgreement',
+    DidDocumentVerificationMethodType.JsonWebKey2020
+  );
+
+  if (keyAgreements.length === 0) {
+    throw new Error(
+      `Recipient ${recipientDid} does not have any key agreements`
+    );
+  }
+
   const requestorPublicSigningKeyId = `${requestorDidData.did}#${requestorDidData.keys.signingKeyPair.public.kid}`;
   const recipientPublicSigningKeyId = verificationMethods[0].id;
+
+  const recipientEncryptedCommunicationSecretKey = await encryptPayload(
+    secretContractKey,
+    requestorDidData.keys.encryptionKeyPair.private,
+    keyAgreements[0].publicKeyJwk,
+    keyAgreements[0].id
+  );
 
   const communicationContract: CommunicationContractRequest = {
     requestorDid: requestorDidData.did,
@@ -50,6 +71,7 @@ export async function generateCommunicationContractSignatureRequest(
     recipientDid,
     recipientPublicSigningKeyId,
     contractExpiresAt: expiresAt,
+    recipientEncryptedCommunicationSecretKey,
   };
 
   const signedCommunicationContractRequest = await signPayload(
@@ -118,13 +140,39 @@ export async function signCommunicationContract(
   recipientDidData: DidData,
   expiresAt?: number
 ) {
-  await verifyCommunicationContractSignatureRequest(
+  const verificationResult = await verifyCommunicationContractSignatureRequest(
     signedCommunicationContractRequest
+  );
+
+  const secretContractKey: string = await decryptPayload(
+    recipientDidData.keys.encryptionKeyPair.private,
+    verificationResult.communicationContractRequest
+      .recipientEncryptedCommunicationSecretKey
+  );
+
+  const keyAgreements = getVerificationMethods(
+    verificationResult.requestorDidDocument,
+    'keyAgreement',
+    DidDocumentVerificationMethodType.JsonWebKey2020
+  );
+
+  if (keyAgreements.length === 0) {
+    throw new Error(
+      `Recipient ${verificationResult.requestorDidDocument.id} does not have any key agreements`
+    );
+  }
+
+  const requestorEncryptedCommunicationSecretKey = await encryptPayload(
+    secretContractKey,
+    recipientDidData.keys.encryptionKeyPair.private,
+    keyAgreements[0].publicKeyJwk,
+    keyAgreements[0].id
   );
 
   const communicationContract: CommunicationContract = {
     requestorSignature: signedCommunicationContractRequest,
     contractExpiresAt: expiresAt,
+    requestorEncryptedCommunicationSecretKey,
   };
 
   const recipientPublicSigningKeyId = `${recipientDidData.did}#${recipientDidData.keys.signingKeyPair.public.kid}`;
@@ -193,5 +241,10 @@ export async function verifyCommunicationContract(
       communicationContractRequestVerificationResult.requestorDidDocument,
     recipientDidDocument,
     communicationContract,
+    recipientEncryptedCommunicationSecretKey:
+      communicationContractRequestVerificationResult
+        .communicationContractRequest.recipientEncryptedCommunicationSecretKey,
+    requestorEncryptedCommunicationSecretKey:
+      communicationContract.requestorEncryptedCommunicationSecretKey,
   };
 }

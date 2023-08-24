@@ -10,7 +10,10 @@ import {
   MediatorEvent,
   MediatorEventPayload,
   MediatorMessageType,
+  MediatorQueryCommandPayload,
   MediatorRegisterCommandPayload,
+  MediatorRequestCommunicationContractCommandPayload,
+  MediatorSignCommunicationContractCommandPayload,
   encryptPayload,
   getVerificationMethods,
 } from '@decentrl/utils/common';
@@ -21,44 +24,72 @@ import { ConfigVariables } from '../../constants';
 import { MediatorError } from '../../errors/mediator.error';
 import { IdentityWalletService } from '../identity-wallet/identity-wallet.service';
 import { VerificationMethod } from 'did-resolver';
+import { CommunicationContractService } from '../communication-contract/communication-contract.service';
+import { EventLogService } from '../event-log/event-log.service';
 
 @Injectable()
 export class WebsocketService {
   constructor(
     private utilService: UtilsService,
     private registerService: RegisterService,
+    private communicationContractService: CommunicationContractService,
+    private eventLogService: EventLogService,
     private configService: ConfigService,
     private identityWalletService: IdentityWalletService
   ) {}
 
   async processCommand(
     type: MediatorCommandType,
-    command: MediatorCommandPayload,
+    command: MediatorCommand,
+    commandPayload: MediatorCommandPayload,
     senderDidDocument: DidDocument
   ): Promise<MediatorEventPayload | void> {
     switch (type) {
       case MediatorCommandType.REGISTER:
         return await this.registerService.registerIdentity({
           didDocument: senderDidDocument,
-          command: command as MediatorRegisterCommandPayload,
+          command: commandPayload as MediatorRegisterCommandPayload,
         });
-        break;
+      case MediatorCommandType.REQUEST_COMMUNICATION_CONTRACT:
+        return await this.communicationContractService.requestCommunicationContract(
+          command,
+          {
+            didDocument: senderDidDocument,
+            command:
+              commandPayload as MediatorRequestCommunicationContractCommandPayload,
+          }
+        );
+      case MediatorCommandType.SIGN_COMMUNICATION_CONTACT:
+        return await this.communicationContractService.signCommunicationContract(
+          command,
+          {
+            didDocument: senderDidDocument,
+            command:
+              commandPayload as MediatorSignCommunicationContractCommandPayload,
+          }
+        );
+      case MediatorCommandType.QUERY:
+        return await this.eventLogService.query({
+          didDocument: senderDidDocument,
+          command: commandPayload as MediatorQueryCommandPayload,
+        });
     }
   }
 
   async commandHandler(
-    body: MediatorCommand
+    command: MediatorCommand
   ): Promise<MediatorEvent | MediatorErrorEvent | void> {
     try {
       const { decryptedPayload, senderDidDocument } =
-        await this.utilService.unwrapMessage(body.payload);
+        await this.utilService.unwrapMessage(command.payload);
 
-      const mediatorCommand: MediatorCommandPayload =
+      const mediatorCommandPayload: MediatorCommandPayload =
         JSON.parse(decryptedPayload);
 
       const mediatorEventPayload = await this.processCommand(
-        mediatorCommand.name,
-        mediatorCommand,
+        mediatorCommandPayload.name,
+        command,
+        mediatorCommandPayload,
         senderDidDocument
       );
 
@@ -83,7 +114,7 @@ export class WebsocketService {
       );
 
       return {
-        id: body.id,
+        id: command.id,
         type: MediatorMessageType.EVENT,
         payload: encryptedPayload,
       };

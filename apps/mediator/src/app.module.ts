@@ -3,11 +3,13 @@ import { WebsocketModule } from './modules/websocket';
 import { IdentityWalletModule } from './modules/identity-wallet/identity-wallet.module';
 import { ConfigModule } from '@microservice-stack/nest-config';
 import { ConfigVariables } from './constants';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
     WebsocketModule,
     IdentityWalletModule,
+    CacheModule.register({ isGlobal: true }),
     ConfigModule.register({
       requiredEnvironmentVariables: [
         ConfigVariables.DATABASE_URL,

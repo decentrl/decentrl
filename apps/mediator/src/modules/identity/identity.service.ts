@@ -3,7 +3,7 @@ import {
   MediatorErrorReason,
   resolveDidDocument,
 } from '@decentrl/utils/common';
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { Cache } from 'cache-manager';
 import { MediatorError } from '../../errors/mediator.error';
 import { DIDResolutionResult } from 'did-resolver';
@@ -17,7 +17,7 @@ export class IdentityService {
       const resolvedDidDocument =
         await resolveDidDocument(did);
 
-      await this.cacheManager.set(did, resolvedDidDocument.didDocument);
+      // await this.cacheManager.set(did, resolvedDidDocument.didDocument, 60 * 30 * 1000);
 
       return resolvedDidDocument;
     } catch (error) {
@@ -26,12 +26,12 @@ export class IdentityService {
   }
 
   async resolveDid(did: string): Promise<DidDocument> {
-    const didDocument: DidDocument | undefined =
-      await this.cacheManager.get<DidDocument>(did);
+    // const didDocument: DidDocument | undefined =
+    //   await this.cacheManager.get<DidDocument>(did);
 
-    if (didDocument) {
-      return didDocument;
-    }
+    // if (didDocument) {
+    //   return didDocument;
+    // }
 
     const resolvedDidDocument: DIDResolutionResult = await this.resolver(did);
 

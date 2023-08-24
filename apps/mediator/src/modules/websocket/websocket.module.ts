@@ -5,9 +5,18 @@ import { UtilsModule } from '../utils/utils.module';
 import { IdentityModule } from '../identity/identity.module';
 import { RegisterModule } from '../register/register.module';
 import { IdentityWalletModule } from '../identity-wallet/identity-wallet.module';
+import { CommunicationContractModule } from '../communication-contract/communication-contract.module';
+import { EventLogModule } from '../event-log/event-log.module';
 
 @Module({
-  imports: [UtilsModule, IdentityModule, IdentityWalletModule, RegisterModule],
+  imports: [
+    UtilsModule,
+    IdentityModule,
+    IdentityWalletModule,
+    RegisterModule,
+    CommunicationContractModule,
+    EventLogModule,
+  ],
   providers: [WebsocketGateway, WebsocketService],
   exports: [WebsocketGateway],
 })
