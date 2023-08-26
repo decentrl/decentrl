@@ -6,6 +6,7 @@
   "private": true,
   "dependencies": {
     "@decentrl/jose": "^4.14.6",
+    "@decentrl/utils-common": "^0.0.4",
     "@microservice-stack/nest-config": "^0.1.56",
     "@nestjs/cache-manager": "^2.1.0",
     "@nestjs/common": "^10.1.0",
@@ -70,4 +71,3 @@
     "includedScripts": []
   }
 }
-

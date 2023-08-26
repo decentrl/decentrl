@@ -1,5 +1,5 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
-import { DidKeyPair, KeyPairGenerator } from '@decentrl/utils/common';
+import { DidKeyPair, KeyPairGenerator } from '@decentrl/utils-common';
 import * as crypto from 'crypto';
 import * as jose from '@decentrl/jose';
 import { promisify } from 'util';

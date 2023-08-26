@@ -1,4 +1,4 @@
-import { DidKeyPair, KeyPairGenerator } from '@decentrl/utils/common';
+import { DidKeyPair, KeyPairGenerator } from '@decentrl/utils-common';
 import { ed25519 } from '@noble/curves/ed25519';
 import { base64url } from '@decentrl/jose';
 import { v4 } from 'uuid';
