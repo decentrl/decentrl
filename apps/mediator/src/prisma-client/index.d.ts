@@ -33,6 +33,7 @@ export type EventLogPayload<ExtArgs extends $Extensions.Args = $Extensions.Defau
   scalars: $Extensions.GetResult<{
     id: string
     name: string
+    communicationChannel: CommunicationChannel | null
     sender: string
     receiver: string | null
     payload: Prisma.JsonValue
@@ -54,7 +55,7 @@ export type EventLog = runtime.Types.DefaultSelection<EventLogPayload>
 
 export const CommunicationChannel: {
   ONE_WAY_PUBLIC: 'ONE_WAY_PUBLIC',
-  TWO_WAY_PUBLIC: 'TWO_WAY_PUBLIC',
+  TWO_WAY_PRIVATE: 'TWO_WAY_PRIVATE',
   GROUP_PRIVATE: 'GROUP_PRIVATE'
 };
 
@@ -1882,6 +1883,7 @@ export namespace Prisma {
   export type EventLogMinAggregateOutputType = {
     id: string | null
     name: string | null
+    communicationChannel: CommunicationChannel | null
     sender: string | null
     receiver: string | null
     createdAt: Date | null
@@ -1890,6 +1892,7 @@ export namespace Prisma {
   export type EventLogMaxAggregateOutputType = {
     id: string | null
     name: string | null
+    communicationChannel: CommunicationChannel | null
     sender: string | null
     receiver: string | null
     createdAt: Date | null
@@ -1898,6 +1901,7 @@ export namespace Prisma {
   export type EventLogCountAggregateOutputType = {
     id: number
     name: number
+    communicationChannel: number
     sender: number
     receiver: number
     payload: number
@@ -1910,6 +1914,7 @@ export namespace Prisma {
   export type EventLogMinAggregateInputType = {
     id?: true
     name?: true
+    communicationChannel?: true
     sender?: true
     receiver?: true
     createdAt?: true
@@ -1918,6 +1923,7 @@ export namespace Prisma {
   export type EventLogMaxAggregateInputType = {
     id?: true
     name?: true
+    communicationChannel?: true
     sender?: true
     receiver?: true
     createdAt?: true
@@ -1926,6 +1932,7 @@ export namespace Prisma {
   export type EventLogCountAggregateInputType = {
     id?: true
     name?: true
+    communicationChannel?: true
     sender?: true
     receiver?: true
     payload?: true
@@ -2010,6 +2017,7 @@ export namespace Prisma {
   export type EventLogGroupByOutputType = {
     id: string
     name: string
+    communicationChannel: CommunicationChannel | null
     sender: string
     receiver: string | null
     payload: JsonValue
@@ -2037,6 +2045,7 @@ export namespace Prisma {
   export type EventLogSelect<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     name?: boolean
+    communicationChannel?: boolean
     sender?: boolean
     receiver?: boolean
     payload?: boolean
@@ -2047,6 +2056,7 @@ export namespace Prisma {
   export type EventLogSelectScalar = {
     id?: boolean
     name?: boolean
+    communicationChannel?: boolean
     sender?: boolean
     receiver?: boolean
     payload?: boolean
@@ -2781,6 +2791,7 @@ export namespace Prisma {
   export const EventLogScalarFieldEnum: {
     id: 'id',
     name: 'name',
+    communicationChannel: 'communicationChannel',
     sender: 'sender',
     receiver: 'receiver',
     payload: 'payload',
@@ -2883,6 +2894,7 @@ export namespace Prisma {
     NOT?: Enumerable<EventLogWhereInput>
     id?: StringFilter | string
     name?: StringFilter | string
+    communicationChannel?: EnumCommunicationChannelNullableFilter | CommunicationChannel | null
     sender?: StringFilter | string
     receiver?: StringNullableFilter | string | null
     payload?: JsonFilter
@@ -2893,6 +2905,7 @@ export namespace Prisma {
   export type EventLogOrderByWithRelationInput = {
     id?: SortOrder
     name?: SortOrder
+    communicationChannel?: SortOrderInput | SortOrder
     sender?: SortOrder
     receiver?: SortOrderInput | SortOrder
     payload?: SortOrder
@@ -2907,6 +2920,7 @@ export namespace Prisma {
   export type EventLogOrderByWithAggregationInput = {
     id?: SortOrder
     name?: SortOrder
+    communicationChannel?: SortOrderInput | SortOrder
     sender?: SortOrder
     receiver?: SortOrderInput | SortOrder
     payload?: SortOrder
@@ -2923,6 +2937,7 @@ export namespace Prisma {
     NOT?: Enumerable<EventLogScalarWhereWithAggregatesInput>
     id?: StringWithAggregatesFilter | string
     name?: StringWithAggregatesFilter | string
+    communicationChannel?: EnumCommunicationChannelNullableWithAggregatesFilter | CommunicationChannel | null
     sender?: StringWithAggregatesFilter | string
     receiver?: StringNullableWithAggregatesFilter | string | null
     payload?: JsonWithAggregatesFilter
@@ -2968,6 +2983,7 @@ export namespace Prisma {
   export type EventLogCreateInput = {
     id?: string
     name: string
+    communicationChannel?: CommunicationChannel | null
     sender: string
     receiver?: string | null
     payload: JsonNullValueInput | InputJsonValue
@@ -2978,6 +2994,7 @@ export namespace Prisma {
   export type EventLogUncheckedCreateInput = {
     id?: string
     name: string
+    communicationChannel?: CommunicationChannel | null
     sender: string
     receiver?: string | null
     payload: JsonNullValueInput | InputJsonValue
@@ -2988,6 +3005,7 @@ export namespace Prisma {
   export type EventLogUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    communicationChannel?: NullableEnumCommunicationChannelFieldUpdateOperationsInput | CommunicationChannel | null
     sender?: StringFieldUpdateOperationsInput | string
     receiver?: NullableStringFieldUpdateOperationsInput | string | null
     payload?: JsonNullValueInput | InputJsonValue
@@ -2998,6 +3016,7 @@ export namespace Prisma {
   export type EventLogUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    communicationChannel?: NullableEnumCommunicationChannelFieldUpdateOperationsInput | CommunicationChannel | null
     sender?: StringFieldUpdateOperationsInput | string
     receiver?: NullableStringFieldUpdateOperationsInput | string | null
     payload?: JsonNullValueInput | InputJsonValue
@@ -3008,6 +3027,7 @@ export namespace Prisma {
   export type EventLogCreateManyInput = {
     id?: string
     name: string
+    communicationChannel?: CommunicationChannel | null
     sender: string
     receiver?: string | null
     payload: JsonNullValueInput | InputJsonValue
@@ -3018,6 +3038,7 @@ export namespace Prisma {
   export type EventLogUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    communicationChannel?: NullableEnumCommunicationChannelFieldUpdateOperationsInput | CommunicationChannel | null
     sender?: StringFieldUpdateOperationsInput | string
     receiver?: NullableStringFieldUpdateOperationsInput | string | null
     payload?: JsonNullValueInput | InputJsonValue
@@ -3028,6 +3049,7 @@ export namespace Prisma {
   export type EventLogUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
+    communicationChannel?: NullableEnumCommunicationChannelFieldUpdateOperationsInput | CommunicationChannel | null
     sender?: StringFieldUpdateOperationsInput | string
     receiver?: NullableStringFieldUpdateOperationsInput | string | null
     payload?: JsonNullValueInput | InputJsonValue
@@ -3087,6 +3109,13 @@ export namespace Prisma {
     _count?: NestedIntFilter
     _min?: NestedStringFilter
     _max?: NestedStringFilter
+  }
+
+  export type EnumCommunicationChannelNullableFilter = {
+    equals?: CommunicationChannel | null
+    in?: Enumerable<CommunicationChannel> | null
+    notIn?: Enumerable<CommunicationChannel> | null
+    not?: NestedEnumCommunicationChannelNullableFilter | CommunicationChannel | null
   }
 
   export type StringNullableFilter = {
@@ -3167,6 +3196,7 @@ export namespace Prisma {
   export type EventLogCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
+    communicationChannel?: SortOrder
     sender?: SortOrder
     receiver?: SortOrder
     payload?: SortOrder
@@ -3177,6 +3207,7 @@ export namespace Prisma {
   export type EventLogMaxOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
+    communicationChannel?: SortOrder
     sender?: SortOrder
     receiver?: SortOrder
     createdAt?: SortOrder
@@ -3185,9 +3216,20 @@ export namespace Prisma {
   export type EventLogMinOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
+    communicationChannel?: SortOrder
     sender?: SortOrder
     receiver?: SortOrder
     createdAt?: SortOrder
+  }
+
+  export type EnumCommunicationChannelNullableWithAggregatesFilter = {
+    equals?: CommunicationChannel | null
+    in?: Enumerable<CommunicationChannel> | null
+    notIn?: Enumerable<CommunicationChannel> | null
+    not?: NestedEnumCommunicationChannelNullableWithAggregatesFilter | CommunicationChannel | null
+    _count?: NestedIntNullableFilter
+    _min?: NestedEnumCommunicationChannelNullableFilter
+    _max?: NestedEnumCommunicationChannelNullableFilter
   }
 
   export type StringNullableWithAggregatesFilter = {
@@ -3285,6 +3327,10 @@ export namespace Prisma {
     push?: Enumerable<CommunicationChannel>
   }
 
+  export type NullableEnumCommunicationChannelFieldUpdateOperationsInput = {
+    set?: CommunicationChannel | null
+  }
+
   export type NullableStringFieldUpdateOperationsInput = {
     set?: string | null
   }
@@ -3335,6 +3381,13 @@ export namespace Prisma {
     not?: NestedIntFilter | number
   }
 
+  export type NestedEnumCommunicationChannelNullableFilter = {
+    equals?: CommunicationChannel | null
+    in?: Enumerable<CommunicationChannel> | null
+    notIn?: Enumerable<CommunicationChannel> | null
+    not?: NestedEnumCommunicationChannelNullableFilter | CommunicationChannel | null
+  }
+
   export type NestedStringNullableFilter = {
     equals?: string | null
     in?: Enumerable<string> | string | null
@@ -3360,6 +3413,27 @@ export namespace Prisma {
     not?: NestedDateTimeFilter | Date | string
   }
 
+  export type NestedEnumCommunicationChannelNullableWithAggregatesFilter = {
+    equals?: CommunicationChannel | null
+    in?: Enumerable<CommunicationChannel> | null
+    notIn?: Enumerable<CommunicationChannel> | null
+    not?: NestedEnumCommunicationChannelNullableWithAggregatesFilter | CommunicationChannel | null
+    _count?: NestedIntNullableFilter
+    _min?: NestedEnumCommunicationChannelNullableFilter
+    _max?: NestedEnumCommunicationChannelNullableFilter
+  }
+
+  export type NestedIntNullableFilter = {
+    equals?: number | null
+    in?: Enumerable<number> | number | null
+    notIn?: Enumerable<number> | number | null
+    lt?: number
+    lte?: number
+    gt?: number
+    gte?: number
+    not?: NestedIntNullableFilter | number | null
+  }
+
   export type NestedStringNullableWithAggregatesFilter = {
     equals?: string | null
     in?: Enumerable<string> | string | null
@@ -3375,17 +3449,6 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter
     _min?: NestedStringNullableFilter
     _max?: NestedStringNullableFilter
-  }
-
-  export type NestedIntNullableFilter = {
-    equals?: number | null
-    in?: Enumerable<number> | number | null
-    notIn?: Enumerable<number> | number | null
-    lt?: number
-    lte?: number
-    gt?: number
-    gte?: number
-    not?: NestedIntNullableFilter | number | null
   }
   export type NestedJsonFilter = 
     | PatchUndefined<

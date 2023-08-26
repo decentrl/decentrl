@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { InternalMediatorCommand } from '../../interfaces';
 import {
@@ -10,7 +10,7 @@ import {
   getMediatorCommunicationChannels,
 } from '@decentrl/utils/common';
 import { IdentityWalletService } from '../identity-wallet/identity-wallet.service';
-import { CommunicationChannel } from '@prisma/client';
+import { CommunicationChannel } from '../../prisma-client';
 import { MediatorError } from '../../errors/mediator.error';
 
 @Injectable()

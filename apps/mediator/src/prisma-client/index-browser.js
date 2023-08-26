@@ -113,6 +113,7 @@ exports.Prisma.RegisteredIdentitiesScalarFieldEnum = {
 exports.Prisma.EventLogScalarFieldEnum = {
   id: 'id',
   name: 'name',
+  communicationChannel: 'communicationChannel',
   sender: 'sender',
   receiver: 'receiver',
   payload: 'payload',
@@ -151,7 +152,7 @@ exports.Prisma.NullsOrder = {
 };
 exports.CommunicationChannel = {
   ONE_WAY_PUBLIC: 'ONE_WAY_PUBLIC',
-  TWO_WAY_PUBLIC: 'TWO_WAY_PUBLIC',
+  TWO_WAY_PRIVATE: 'TWO_WAY_PRIVATE',
   GROUP_PRIVATE: 'GROUP_PRIVATE'
 };
 

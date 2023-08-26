@@ -8,6 +8,7 @@ import {
   MediatorQueryCommandPayload,
 } from '@decentrl/utils/common';
 import { InternalMediatorCommand } from '../../interfaces';
+import { CommunicationChannel } from '../../prisma-client';
 
 @Injectable()
 export class EventLogService {
@@ -23,6 +24,8 @@ export class EventLogService {
         id: command.id,
         name: commandPayload.name,
         payload: commandPayload.payload,
+        communicationChannel:
+          commandPayload.communicationChannel as CommunicationChannel,
         sender: senderDidDocument.id,
         receiver: commandPayload.recipient,
         metadata: commandPayload.metadata,
@@ -33,7 +36,17 @@ export class EventLogService {
   async query({
     didDocument,
     command: {
-      payload: { limit, offset, orderBy, sender, gte, lte, metadata, command },
+      payload: {
+        limit,
+        offset,
+        orderBy,
+        sender,
+        receiver,
+        gte,
+        lte,
+        metadata,
+        command,
+      },
     },
   }: InternalMediatorCommand<MediatorQueryCommandPayload>) {
     const metadataKeys = Object.keys(metadata ?? {});
@@ -52,7 +65,10 @@ export class EventLogService {
       where: {
         sender,
         name: command,
-        receiver: didDocument.id,
+        receiver: receiver ? receiver : didDocument.id,
+        communicationChannel: receiver
+          ? CommunicationChannel.ONE_WAY_PUBLIC
+          : undefined,
         ...(gte && {
           createdAt: {
             gte: new Date(gte),

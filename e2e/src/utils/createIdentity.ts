@@ -1,4 +1,5 @@
 import {
+  Cryptography,
   DidData,
   DidDocument,
   encryptPayload,
@@ -18,8 +19,8 @@ export const createAndRegisterIdentity = async (
 ): Promise<[DidData, DidDocument]> => {
   const identityDidData = await generateDid(
     domain.replace(':', '%3A'),
-    nodeUtils.generateP256ECDHKeyPair,
-    nodeUtils.generateP256KeyPair
+    nodeUtils.generateX25519KeyPair,
+    nodeUtils.generateEd25519KeyPair
   );
 
   const identityDidDocument = generateDidDocument(identityDidData, {
@@ -35,9 +36,10 @@ export const createAndRegisterIdentity = async (
    * to verify that the DID document was created by the DID owner.
    */
   const didDocumentSignature = await signPayload(
+    JSON.stringify(identityDidDocument),
     identityDidData.keys.signingKeyPair.private,
     publicSigningKid,
-    JSON.stringify(identityDidDocument)
+    Cryptography.NODE
   );
 
   /**
@@ -55,6 +57,7 @@ export const createAndRegisterIdentity = async (
    */
   const encryptedDidDocumentPayload = await encryptPayload(
     didDocumentSignature,
+    Cryptography.NODE,
     identityDidData.keys.encryptionKeyPair.private,
     registryRoutingKey.publicKeyJwk,
     registryRoutingKey.id

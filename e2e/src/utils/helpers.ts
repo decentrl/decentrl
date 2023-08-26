@@ -3,10 +3,7 @@ import { Test } from '@nestjs/testing';
 import { WebSocketAdapter } from '../../../apps/mediator/src/modules/websocket/websocket.adapter';
 import { ConsoleLogger, INestApplication } from '@nestjs/common';
 import { WebSocket } from 'ws';
-import { FastifyAdapter } from '@nestjs/platform-fastify';
 import { StringDecoder } from 'string_decoder';
-
-import fs from 'fs';
 import { HttpsOptions } from '@nestjs/common/interfaces/external/https-options.interface';
 
 export const createNestApplication = async (
