@@ -7,16 +7,15 @@
     "url": "https://github.com/decentrl/decentrl/tree/main/packages/utils/node"
   },
   "author": {
-    "name": "Decentrl Org"
+    "name": "decentrl.network"
   },
-  "version": "0.0.1",
-  "type": "commonjs",
+  "version": "0.0.3",
   "dependencies": {
-    "uuid": "^9.0.0",
-    "jose": "^4.14.4"
+    "jose": "^4.14.4",
+    "tslib": "^2.3.0",
+    "uuid": "^9.0.0"
   },
-  "devDependencies": {},
-  "publishConfig": {
-    "access": "public"
-  }
+  "type": "commonjs",
+  "main": "./src/index.js",
+  "typings": "./src/index.d.ts"
 }

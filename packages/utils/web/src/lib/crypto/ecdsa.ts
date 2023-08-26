@@ -1,4 +1,4 @@
-import { DidKeyPair, KeyPairGenerator } from '@decentrl/utils/common';
+import { DidKeyPair, KeyPairGenerator } from '@decentrl/utils-common';
 import { v4 } from 'uuid';
 
 export const generateP256KeyPair: KeyPairGenerator =

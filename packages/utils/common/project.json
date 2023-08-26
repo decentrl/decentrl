@@ -5,14 +5,13 @@
   "projectType": "library",
   "targets": {
     "build": {
-      "executor": "@nx/esbuild:esbuild",
+      "executor": "@nx/js:tsc",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/packages/utils/common",
         "main": "packages/utils/common/src/index.ts",
         "tsConfig": "packages/utils/common/tsconfig.lib.json",
-        "assets": [],
-        "generatePackageJson": true
+        "assets": ["packages/utils/common/*.md"]
       }
     },
     "publish": {
@@ -23,7 +22,10 @@
       "executor": "@nx/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["packages/utils/common/**/*.ts"]
+        "lintFilePatterns": [
+          "packages/utils/common/**/*.ts",
+          "packages/utils/common/package.json"
+        ]
       }
     },
     "test": {

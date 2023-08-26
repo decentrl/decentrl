@@ -1,5 +1,5 @@
 import { v4 } from 'uuid';
-import { DidKeyPair, KeyPairGenerator } from '@decentrl/utils/common';
+import { DidKeyPair, KeyPairGenerator } from '@decentrl/utils-common';
 
 export const generateP256ECDHKeyPair: KeyPairGenerator =
   async (): Promise<DidKeyPair> => {
