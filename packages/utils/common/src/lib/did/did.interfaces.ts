@@ -1,4 +1,4 @@
-import { JWK } from 'jose';
+import { JWK } from '@decentrl/jose';
 
 export interface DidKeyPair {
   private: JWK & { kid: string };

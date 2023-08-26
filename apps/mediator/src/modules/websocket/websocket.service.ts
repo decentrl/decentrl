@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import {
+  Cryptography,
   DidDocument,
   DidDocumentVerificationMethodType,
   MediatorCommand,
@@ -132,6 +133,7 @@ export class WebsocketService {
 
       const encryptedPayload = await encryptPayload(
         JSON.stringify(mediatorEventPayload),
+        Cryptography.NODE,
         this.configService.get(ConfigVariables.KEY_AGREEMENT_ECDH_PRIVATE_JWK),
         senderEncryptionKeys[0].publicKeyJwk,
         (

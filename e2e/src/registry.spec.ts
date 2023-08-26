@@ -4,6 +4,7 @@ import { Test } from '@nestjs/testing';
 import { AppModule } from '../../apps/registry/src/app.module';
 import request from 'supertest';
 import {
+  Cryptography,
   DidDocument,
   DidDocumentBuilder,
   encryptPayload,
@@ -12,10 +13,9 @@ import {
   getRegistryRoutingKey,
   signPayload,
 } from '@decentrl/utils/common';
-import {
-  generateP256ECDHKeyPair,
-  generateP256KeyPair,
-} from '@decentrl/utils/node';
+
+import * as nodeUtils from '@decentrl/utils/node';
+import * as webUtils from '@decentrl/utils/web';
 
 describe('Registry', () => {
   let application: INestApplication;
@@ -32,8 +32,8 @@ describe('Registry', () => {
   });
 
   afterAll(async () => {
-    await application.close()
-  })
+    await application.close();
+  });
 
   it('should register did', async () => {
     /**
@@ -69,8 +69,8 @@ describe('Registry', () => {
      */
     const did = await generateDid(
       'localhost:5001',
-      generateP256ECDHKeyPair,
-      generateP256KeyPair
+      webUtils.generateX25519KeyPair,
+      webUtils.generateEd25519KeyPair
     );
 
     /**
@@ -91,9 +91,10 @@ describe('Registry', () => {
      * to verify that the DID document was created by the DID owner.
      */
     const didDocumentSignature = await signPayload(
+      JSON.stringify(didDocument),
       did.keys.signingKeyPair.private,
       publicSigningKid,
-      JSON.stringify(didDocument)
+      Cryptography.NODE
     );
 
     /**
@@ -111,6 +112,7 @@ describe('Registry', () => {
      */
     const encryptedDidDocumentPayload = await encryptPayload(
       didDocumentSignature,
+      Cryptography.NODE,
       did.keys.encryptionKeyPair.private,
       registryRoutingKey.publicKeyJwk,
       registryRoutingKey.id
@@ -146,20 +148,22 @@ describe('Registry', () => {
     const updatedDidDocument: DidDocument = {
       ...didDocument,
       alias: 'Elliot',
-    }
+    };
 
     /**
      * Updating the DID document is basically the same process, just with
      * different HTTP method (put).
      */
     const updatedDidDocumentSignature = await signPayload(
+      JSON.stringify(updatedDidDocument),
       did.keys.signingKeyPair.private,
       publicSigningKid,
-      JSON.stringify(updatedDidDocument)
+      Cryptography.NODE
     );
 
     const encryptedUpdatedDidDocumentPayload = await encryptPayload(
       updatedDidDocumentSignature,
+      Cryptography.NODE,
       did.keys.encryptionKeyPair.private,
       registryRoutingKey.publicKeyJwk,
       registryRoutingKey.id
@@ -172,11 +176,15 @@ describe('Registry', () => {
       })
       .expect(200);
 
-    const getUpdatedDidDocumentResponse = await request(application.getHttpServer())
+    const getUpdatedDidDocumentResponse = await request(
+      application.getHttpServer()
+    )
       .get(`/${id}/did.json`)
       .expect(200);
 
-    expect(JSON.parse(getUpdatedDidDocumentResponse.text)).toEqual(updatedDidDocument);
+    expect(JSON.parse(getUpdatedDidDocumentResponse.text)).toEqual(
+      updatedDidDocument
+    );
   });
 });
 

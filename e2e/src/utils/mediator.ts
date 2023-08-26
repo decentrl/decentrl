@@ -1,6 +1,7 @@
 import { WebSocket } from 'ws';
 import { StringDecoder } from 'string_decoder';
 import {
+  Cryptography,
   DidData,
   DidDocument,
   MediatorCommandType,
@@ -28,7 +29,8 @@ export const registerIdentityOnMediator = async (
         },
       },
       identityDidData,
-      mediatorDidDocument
+      mediatorDidDocument,
+      Cryptography.NODE
     );
 
   client.send(
@@ -50,6 +52,7 @@ export const registerIdentityOnMediator = async (
     await readMediatorEventPayload(
       mediatorEventResponse,
       identityDidData,
+      Cryptography.NODE,
       () =>
         ({
           didDocument: mediatorDidDocument,
@@ -80,9 +83,10 @@ export const listenToMediatorEvent = async <T>(
   });
 
   const decryptedResponse = await decryptPayload(
+    payload,
     identityDidData.keys.encryptionKeyPair.private,
-    payload
+    Cryptography.NODE
   );
 
-  return JSON.parse(decryptedResponse) as T;
+  return JSON.parse(decryptedResponse.plaintext.toString()) as T;
 };

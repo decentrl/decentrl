@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { DIDResolutionResult } from 'did-resolver';
 import {
   DidDocumentVerificationMethodType,
@@ -10,51 +10,128 @@ import {
   DecryptAndVerifyPayloadResult,
   KeyResolutionResult,
 } from './ecdh.interfaces';
-import * as jose from 'jose';
+import * as jose from '@decentrl/jose';
+import { x25519 } from '@noble/curves/ed25519';
+import { Cryptography } from './crypto.interfaces';
+import { concat, lengthAndInput, encoder, uint32be, concatKdf } from './crypto';
 
 export type DidResolver = (did: string) => Promise<DIDResolutionResult>;
 
 export async function encryptPayload(
   payload: string,
+  type: Cryptography,
   privateKeyJwk: jose.JWK,
   publicKeyJwk: jose.JWK,
   publicKeyId: string,
   typ?: string
 ): Promise<string> {
-  const privateKey = await jose.importJWK(privateKeyJwk, 'ECDH-ES', false);
+  const encryptor = new jose.CompactEncrypt(
+    new TextEncoder().encode(payload)
+  ).setProtectedHeader({
+    alg: 'ECDH-ES',
+    enc: 'A256GCM',
+    kid: publicKeyId,
+    typ,
+  });
 
-  const publicKey = await jose.importJWK(publicKeyJwk, 'ECDH-ES', false);
+  if (type === Cryptography.NODE) {
+    if (privateKeyJwk.crv !== 'X25519' || publicKeyJwk.crv !== 'X25519') {
+      throw new Error('Invalid key type');
+    }
 
-  return new jose.CompactEncrypt(new TextEncoder().encode(payload))
-    .setProtectedHeader({
-      alg: 'ECDH-ES',
-      enc: 'A256GCM',
-      kid: publicKeyId,
-      typ,
-    })
-    .setKeyManagementParameters({
-      epk: privateKey as jose.KeyLike,
-    })
-    .encrypt(publicKey as jose.KeyLike);
+    const privateKey = await jose.importJWK(privateKeyJwk, 'ECDH-ES', false);
+    const publicKey = await jose.importJWK(publicKeyJwk, 'ECDH-ES', false);
+
+    return encryptor
+      .setKeyManagementParameters({
+        epk: privateKey as jose.KeyLike,
+      })
+      .encrypt(publicKey as jose.KeyLike);
+  } else {
+    const privateKey: Uint8Array = jose.base64url.decode(privateKeyJwk.d!);
+    const publicKey: Uint8Array = jose.base64url.decode(publicKeyJwk.x!);
+
+    return encryptor
+      .setEncryptKeyManagementFunction(async () => {
+        const secret = await deriveKey(privateKey, publicKey, 'A256GCM');
+
+        const parameters: jose.JWEHeaderParameters = {
+          epk: {
+            x: jose.base64url.encode(x25519.getPublicKey(privateKey)),
+            kty: 'OKP',
+            crv: 'X25519',
+          },
+        };
+
+        return {
+          cek: secret,
+          parameters,
+        };
+      })
+      .encrypt(publicKey);
+  }
 }
 
 export async function decryptPayload(
-  privateJwk: jose.JWK,
-  payload: string
-): Promise<string> {
-  const privateKey = await jose.importJWK(privateJwk, 'ECDH-ES');
-  const decryptionResult = await jose.compactDecrypt(payload, privateKey, {});
+  payload: string | Uint8Array,
+  privateKeyJwk: jose.JWK,
+  type: Cryptography
+): Promise<jose.CompactDecryptResult> {
+  if (type === Cryptography.NODE) {
+    const privateKey = await jose.importJWK(privateKeyJwk, 'ECDH-ES');
 
-  return decryptionResult.plaintext.toString();
+    const decryptionResult = await jose.compactDecrypt(payload, privateKey, {});
+
+    return decryptionResult;
+  }
+
+  const privateKey = jose.base64url.decode(privateKeyJwk.d!);
+
+  const decryptionResult = await jose.compactDecrypt(
+    payload,
+    privateKey as Uint8Array,
+    {
+      decryptKeyManagementFunction: async (alg, key, encKey, epk) => {
+        if (alg !== 'ECDH-ES') {
+          throw new Error('Invalid algorithm');
+        }
+
+        const publicKey = jose.base64url.decode((epk['epk'] as jose.JWK).x!);
+
+        const secret = await deriveKey(privateKey, publicKey, 'A256GCM');
+
+        return secret;
+      },
+    }
+  );
+
+  return decryptionResult;
+}
+
+async function deriveKey(
+  privateKey: Uint8Array,
+  publicKey: Uint8Array,
+  algorithm: string
+): Promise<Uint8Array> {
+  const value = concat(
+    lengthAndInput(encoder.encode(algorithm)),
+    lengthAndInput(new Uint8Array(0)),
+    lengthAndInput(new Uint8Array(0)),
+    uint32be(256)
+  );
+
+  const secret = x25519.getSharedSecret(privateKey, publicKey);
+
+  return concatKdf(secret, 256, value);
 }
 
 export async function decryptAndVerifyPayload(
-  payload: string,
+  payload: string | Uint8Array,
   privateKeyJwk: jose.JWK,
+  type: Cryptography,
   resolver?: DidResolver
 ): Promise<DecryptAndVerifyPayloadResult> {
-  const privateKey = await jose.importJWK(privateKeyJwk, 'ECDH-ES');
-  const decryptionResult = await jose.compactDecrypt(payload, privateKey, {});
+  const decryptionResult = await decryptPayload(payload, privateKeyJwk, type);
 
   if (!decryptionResult.protectedHeader.kid) {
     throw new Error('No kid in protected header');

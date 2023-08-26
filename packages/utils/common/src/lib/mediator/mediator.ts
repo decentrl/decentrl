@@ -1,3 +1,4 @@
+import { Cryptography } from '../crypto/crypto.interfaces';
 import {
   DidResolver,
   decryptAndVerifyPayload,
@@ -26,7 +27,8 @@ export const generateMediatorCommand = async <
 >(
   commandPayload: T,
   didData: DidData,
-  mediatorDidDocument: DidDocument
+  mediatorDidDocument: DidDocument,
+  type: Cryptography,
 ): Promise<MediatorCommand> => {
   const verificationMethods = getVerificationMethods(
     mediatorDidDocument,
@@ -42,6 +44,7 @@ export const generateMediatorCommand = async <
 
   const encryptedCommandPayload = await encryptPayload(
     JSON.stringify(commandPayload),
+    type,
     didData.keys.encryptionKeyPair.private,
     verificationMethods[0].publicKeyJwk,
     `${didData.did}#${didData.keys.encryptionKeyPair.public.kid}`
@@ -59,11 +62,13 @@ export const generateMediatorCommand = async <
 export const readMediatorEventPayload = async <T extends MediatorEventPayload>(
   payload: MediatorEvent,
   didData: DidData,
+  type: Cryptography,
   resolver?: DidResolver
 ): Promise<T> => {
   const verificationResult = await decryptAndVerifyPayload(
     payload.payload,
     didData.keys.encryptionKeyPair.private,
+    type,
     resolver
   );
 

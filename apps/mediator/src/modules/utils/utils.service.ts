@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import {
+  Cryptography,
   DecryptAndVerifyPayloadResult,
   MediatorErrorReason,
   decryptAndVerifyPayload,
@@ -24,6 +25,7 @@ export class UtilsService {
       return await decryptAndVerifyPayload(
         encryptedPayload,
         encryptionKeyPair.private,
+        Cryptography.NODE,
         this.identityService.resolver
       );
     } catch (error) {

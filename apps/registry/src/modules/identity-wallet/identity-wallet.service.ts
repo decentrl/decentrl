@@ -1,4 +1,4 @@
-import * as jose from 'jose';
+import * as jose from '@decentrl/jose';
 import { ConfigService } from '@microservice-stack/nest-config';
 import {
   DidDocument,

@@ -1,3 +1,3 @@
-export * from './lib/crypto/ecdh';
-export * from './lib/crypto/ecdsa';
+export * from './lib/crypto/ed25519';
+export * from './lib/crypto/x25519';
 export * from './lib/crypto/random';

@@ -1,14 +1,12 @@
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import { DidKeyPair, KeyPairGenerator } from '@decentrl/utils/common';
 import * as crypto from 'crypto';
-import * as jose from 'jose';
+import * as jose from '@decentrl/jose';
 import { promisify } from 'util';
 import { v4 } from 'uuid';
 
-export const generateP256KeyPair: KeyPairGenerator = async (): Promise<DidKeyPair> => {
-  const keyPair = await promisify(crypto.generateKeyPair)('ec', {
-    namedCurve: 'P-256',
-  });
+export const generateX25519KeyPair: KeyPairGenerator = async (): Promise<DidKeyPair> => {
+  const keyPair = await promisify(crypto.generateKeyPair)('x25519');
 
   const privateKeyJwk = await jose.exportJWK(keyPair.privateKey);
   const publicKeyJwk = await jose.exportJWK(keyPair.publicKey);

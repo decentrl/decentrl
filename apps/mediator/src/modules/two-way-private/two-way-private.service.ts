@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { EventLogService } from '../event-log/event-log.service';
 import {
+  Cryptography,
   MediatorCommand,
   MediatorErrorReason,
   MediatorEventPayload,
@@ -53,7 +54,8 @@ export class TwoWayPrivateService {
     recipientDid: string
   ) {
     const verificationResult = await verifyCommunicationContract(
-      signedCommunicationContract
+      signedCommunicationContract,
+      Cryptography.NODE
     );
 
     const contractParties = [
