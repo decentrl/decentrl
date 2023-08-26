@@ -1,4 +1,4 @@
-import { JWK } from 'jose';
+import { JWK } from '@decentrl/jose';
 
 export enum DidDocumentVerificationMethodType {
   JsonWebKey2020 = 'JsonWebKey2020',

@@ -9,10 +9,11 @@
   "author": {
     "name": "decentrl.network"
   },
-  "version": "0.0.3",
+  "version": "0.0.4",
   "dependencies": {
+    "@decentrl/jose": "^4.14.6",
+    "@noble/curves": "^1.2.0",
     "did-resolver": "^4.1.0",
-    "jose": "^4.14.4",
     "jsonschema": "^1.4.1",
     "tslib": "^2.3.0",
     "uuid": "^9.0.0",

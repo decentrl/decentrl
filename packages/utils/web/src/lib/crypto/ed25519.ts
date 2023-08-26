@@ -1,4 +1,3 @@
-// eslint-disable-next-line @nx/enforce-module-boundaries
 import { DidKeyPair, KeyPairGenerator } from '@decentrl/utils/common';
 import { ed25519 } from '@noble/curves/ed25519';
 import { base64url } from '@decentrl/jose';

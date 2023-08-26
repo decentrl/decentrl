@@ -15,9 +15,6 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@decentrl/utils-common": ["packages/utils/common/src/index.ts"],
-      "@decentrl/utils-node": ["packages/utils/node/src/index.ts"],
-      "@decentrl/utils-web": ["packages/utils/web/src/index.ts"],
       "@decentrl/utils/common": ["packages/utils/common/src/index.ts"],
       "@decentrl/utils/node": ["packages/utils/node/src/index.ts"],
       "@decentrl/utils/web": ["packages/utils/web/src/index.ts"]
