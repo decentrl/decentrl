@@ -1,4 +1,7 @@
-import { DidDocument, DidDocumentVerificationMethod } from "../did-document/did-document.interfaces";
+import {
+  DidDocument,
+  DidDocumentVerificationMethod,
+} from '../did-document/did-document.interfaces';
 
 export interface DecryptAndVerifyPayloadResult {
   decryptedPayload: string;

@@ -2,7 +2,7 @@ import {
   readSignaturePayload,
   signPayload,
   verifySignature,
-} from '../crypto/ecdsa';
+} from '../crypto/eddsa';
 import { resolveDidDocument } from '../did-document/did-document';
 import {
   DidDocument,
@@ -20,11 +20,13 @@ import {
   CommunicationContractVerificationResult,
 } from './communication-contract.interfaces';
 import { decryptPayload, encryptPayload } from '../crypto/ecdh';
+import { Cryptography } from '../crypto/crypto.interfaces';
 
 export async function generateCommunicationContractSignatureRequest(
   requestorDidData: DidData,
   recipientDid: string,
   secretContractKey: string,
+  type: Cryptography,
   expiresAt?: number
 ): Promise<string> {
   const recipientDidResolutionResult = await resolveDidDocument(recipientDid);
@@ -60,6 +62,7 @@ export async function generateCommunicationContractSignatureRequest(
 
   const recipientEncryptedCommunicationSecretKey = await encryptPayload(
     secretContractKey,
+    type,
     requestorDidData.keys.encryptionKeyPair.private,
     keyAgreements[0].publicKeyJwk,
     keyAgreements[0].id
@@ -75,16 +78,18 @@ export async function generateCommunicationContractSignatureRequest(
   };
 
   const signedCommunicationContractRequest = await signPayload(
+    JSON.stringify(communicationContract),
     requestorDidData.keys.signingKeyPair.private,
     requestorPublicSigningKeyId,
-    JSON.stringify(communicationContract)
+    type
   );
 
   return signedCommunicationContractRequest;
 }
 
 export async function verifyCommunicationContractSignatureRequest(
-  signedCommunicationContractRequest: string
+  signedCommunicationContractRequest: string,
+  type: Cryptography
 ): Promise<CommunicationContractRequestVerificationResult> {
   const communicationContractRequest =
     await readSignaturePayload<CommunicationContractRequest>(
@@ -119,8 +124,9 @@ export async function verifyCommunicationContractSignatureRequest(
   }
 
   const signaturePayload = await verifySignature(
+    signedCommunicationContractRequest,
     requestorPublicSigningKey.publicKeyJwk,
-    signedCommunicationContractRequest
+    type
   );
 
   if (signaturePayload.protectedHeader.kid !== requestorPublicSigningKey.id) {
@@ -138,16 +144,19 @@ export async function verifyCommunicationContractSignatureRequest(
 export async function signCommunicationContract(
   signedCommunicationContractRequest: string,
   recipientDidData: DidData,
+  type: Cryptography,
   expiresAt?: number
 ) {
   const verificationResult = await verifyCommunicationContractSignatureRequest(
-    signedCommunicationContractRequest
+    signedCommunicationContractRequest,
+    type
   );
 
-  const secretContractKey: string = await decryptPayload(
-    recipientDidData.keys.encryptionKeyPair.private,
+  const secretContractKey = await decryptPayload(
     verificationResult.communicationContractRequest
-      .recipientEncryptedCommunicationSecretKey
+      .recipientEncryptedCommunicationSecretKey,
+    recipientDidData.keys.encryptionKeyPair.private,
+    type
   );
 
   const keyAgreements = getVerificationMethods(
@@ -163,7 +172,8 @@ export async function signCommunicationContract(
   }
 
   const requestorEncryptedCommunicationSecretKey = await encryptPayload(
-    secretContractKey,
+    secretContractKey.plaintext.toString(),
+    type,
     recipientDidData.keys.encryptionKeyPair.private,
     keyAgreements[0].publicKeyJwk,
     keyAgreements[0].id
@@ -178,16 +188,18 @@ export async function signCommunicationContract(
   const recipientPublicSigningKeyId = `${recipientDidData.did}#${recipientDidData.keys.signingKeyPair.public.kid}`;
 
   const signedCommunicationContract = await signPayload(
+    JSON.stringify(communicationContract),
     recipientDidData.keys.signingKeyPair.private,
     recipientPublicSigningKeyId,
-    JSON.stringify(communicationContract)
+    type
   );
 
   return signedCommunicationContract;
 }
 
 export async function verifyCommunicationContract(
-  signedCommunicationContract: string
+  signedCommunicationContract: string,
+  type: Cryptography
 ): Promise<CommunicationContractVerificationResult> {
   const communicationContract =
     await readSignaturePayload<CommunicationContract>(
@@ -203,7 +215,8 @@ export async function verifyCommunicationContract(
 
   const communicationContractRequestVerificationResult =
     await verifyCommunicationContractSignatureRequest(
-      communicationContract.requestorSignature
+      communicationContract.requestorSignature,
+      type
     );
 
   const recipientDidResolutionResult = await resolveDidDocument(
@@ -226,8 +239,9 @@ export async function verifyCommunicationContract(
   }
 
   const signaturePayload = await verifySignature(
+    signedCommunicationContract,
     recipientPublicSigningKey.publicKeyJwk,
-    signedCommunicationContract
+    type
   );
 
   if (signaturePayload.protectedHeader.kid !== recipientPublicSigningKey.id) {

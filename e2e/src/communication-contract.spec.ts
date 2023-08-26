@@ -1,6 +1,7 @@
 /* eslint-disable @nx/enforce-module-boundaries */
 import * as nodeUtils from '@decentrl/utils/node';
 import {
+  Cryptography,
   DidDocumentBuilder,
   MediatorCommandType,
   MediatorCommunicationChannel,
@@ -120,7 +121,8 @@ describe('Register on mediator', () => {
       await generateCommunicationContractSignatureRequest(
         identityOne[0],
         identityTwo[0].did,
-        secretContractKey
+        secretContractKey,
+        Cryptography.NODE
       );
 
     const requestCommunicationContractCommandPayload =
@@ -133,7 +135,8 @@ describe('Register on mediator', () => {
           },
         },
         identityOne[0],
-        mediatorDidDocument
+        mediatorDidDocument,
+        Cryptography.NODE
       );
 
     websocketClient.send(
@@ -163,7 +166,8 @@ describe('Register on mediator', () => {
           },
         },
         identityTwo[0],
-        mediatorDidDocument
+        mediatorDidDocument,
+        Cryptography.NODE
       );
 
     websocketClient.send(
@@ -196,7 +200,8 @@ describe('Register on mediator', () => {
     });
 
     await verifyCommunicationContractSignatureRequest(
-      mediatorResponse.payload[0].payload.contract
+      mediatorResponse.payload[0].payload.contract,
+      Cryptography.NODE
     );
   });
 
@@ -205,7 +210,8 @@ describe('Register on mediator', () => {
   it('identity two should sign the communication contract request and send it back to identity one', async () => {
     signedCommunicationContract = await signCommunicationContract(
       signedCommunicationContractRequest,
-      identityTwo[0]
+      identityTwo[0],
+      Cryptography.NODE
     );
 
     const signCommunicationContractCommandPayload =
@@ -218,7 +224,8 @@ describe('Register on mediator', () => {
           },
         },
         identityTwo[0],
-        mediatorDidDocument
+        mediatorDidDocument,
+        Cryptography.NODE
       );
 
     websocketClient.send(
@@ -248,7 +255,8 @@ describe('Register on mediator', () => {
           },
         },
         identityOne[0],
-        mediatorDidDocument
+        mediatorDidDocument,
+        Cryptography.NODE
       );
 
     websocketClient.send(
@@ -281,7 +289,8 @@ describe('Register on mediator', () => {
     });
 
     await verifyCommunicationContract(
-      mediatorResponse.payload[0].payload.contract
+      mediatorResponse.payload[0].payload.contract,
+      Cryptography.NODE
     );
   });
 
@@ -291,7 +300,8 @@ describe('Register on mediator', () => {
       identityTwo[1], // Did Document
       {
         message: 'Hello from identity one',
-      }
+      },
+      Cryptography.NODE
     );
 
     const sendTwoWayPrivateMessageCommandPayload =
@@ -306,7 +316,8 @@ describe('Register on mediator', () => {
           },
         },
         identityOne[0],
-        mediatorDidDocument
+        mediatorDidDocument,
+        Cryptography.NODE
       );
 
     websocketClient.send(
@@ -320,8 +331,6 @@ describe('Register on mediator', () => {
       identityOne[0],
       websocketClient
     );
-
-    console.log(mediatorResponse);
   });
 
   it('identity two should query mediator for private messages', async () => {
@@ -334,7 +343,8 @@ describe('Register on mediator', () => {
           },
         },
         identityTwo[0],
-        mediatorDidDocument
+        mediatorDidDocument,
+        Cryptography.NODE
       );
 
     websocketClient.send(
@@ -349,11 +359,10 @@ describe('Register on mediator', () => {
       websocketClient
     );
 
-    console.log(mediatorResponse);
-
     const message = await decryptTwoWayPrivateMessage(
       identityTwo[0],
-      mediatorResponse.payload[0].payload.message
+      mediatorResponse.payload[0].payload.message,
+      Cryptography.NODE
     );
 
     expect(message).toStrictEqual({

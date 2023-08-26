@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { IdentityWalletService } from '../identity-wallet/identity-wallet.service';
 import {
+  Cryptography,
   DidDocument,
   DidDocumentBuilder,
   decryptPayload,
@@ -67,8 +68,9 @@ export class DidService {
 
     try {
       await verifySignature(
+        didDocumentSignature,
         verificationMethod.publicKeyJwk,
-        didDocumentSignature
+        Cryptography.NODE
       );
     } catch {
       throw new BadRequestException('Invalid signature');
@@ -81,19 +83,20 @@ export class DidService {
     const keyPair = this.identityWalletService.getEncryptionKeyPair();
 
     const didDocumentSignature = await decryptPayload(
+      encryptedDidDocument,
       keyPair.private,
-      encryptedDidDocument
+      Cryptography.NODE
     );
 
     const didDocument = await this.validateDidDocumentSignature(
-      didDocumentSignature
+      didDocumentSignature.plaintext.toString()
     );
 
     await this.prismaService.didDocument.create({
       data: {
         did: didDocument.id,
         didDocument: JSON.stringify(didDocument),
-        signature: didDocumentSignature,
+        signature: didDocumentSignature.plaintext.toString(),
       },
     });
   }
@@ -102,11 +105,14 @@ export class DidService {
     const keyPair = this.identityWalletService.getEncryptionKeyPair();
 
     const didDocumentSignature = await decryptPayload(
+      encryptedDidDocument,
       keyPair.private,
-      encryptedDidDocument
+      Cryptography.NODE
     );
 
-    const didDocument = await this.extractDidDocument(didDocumentSignature);
+    const didDocument = await this.extractDidDocument(
+      didDocumentSignature.plaintext.toString()
+    );
 
     const existingDidDocument = await this.prismaService.didDocument.findUnique(
       {
@@ -121,7 +127,7 @@ export class DidService {
     }
 
     await this.validateDidDocumentSignature(
-      didDocumentSignature,
+      didDocumentSignature.plaintext.toString(),
       JSON.parse(existingDidDocument.didDocument as string) as DidDocument
     );
 
@@ -131,7 +137,7 @@ export class DidService {
       },
       data: {
         didDocument: JSON.stringify(didDocument),
-        signature: didDocumentSignature,
+        signature: didDocumentSignature.plaintext.toString(),
         version: {
           increment: 1,
         },

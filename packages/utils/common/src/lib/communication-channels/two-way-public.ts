@@ -1,3 +1,4 @@
+import { Cryptography } from '../crypto/crypto.interfaces';
 import { decryptAndVerifyPayload, encryptPayload } from '../crypto/ecdh';
 import {
   DidDocument,
@@ -9,7 +10,8 @@ import { DidData } from '../did/did.interfaces';
 export async function encryptTwoWayPrivateMessage(
   senderDidData: DidData,
   recipientDidDocument: DidDocument,
-  message: Record<string, any>
+  message: Record<string, any>,
+  type: Cryptography
 ): Promise<string> {
   const verificationMethods = getVerificationMethods(
     recipientDidDocument,
@@ -25,6 +27,7 @@ export async function encryptTwoWayPrivateMessage(
 
   return encryptPayload(
     JSON.stringify(message),
+    type,
     senderDidData.keys.encryptionKeyPair.private,
     verificationMethods[0].publicKeyJwk,
     `${senderDidData.did}#${senderDidData.keys.encryptionKeyPair.public.kid}`
@@ -33,10 +36,15 @@ export async function encryptTwoWayPrivateMessage(
 
 export async function decryptTwoWayPrivateMessage<
   T extends Record<string, any>
->(recipientDidData: DidData, encryptedMessage: string): Promise<T> {
+>(
+  recipientDidData: DidData,
+  encryptedMessage: string,
+  type: Cryptography
+): Promise<T> {
   const decryptedPayload = await decryptAndVerifyPayload(
     encryptedMessage,
-    recipientDidData.keys.encryptionKeyPair.private
+    recipientDidData.keys.encryptionKeyPair.private,
+    type
   );
 
   return JSON.parse(decryptedPayload.decryptedPayload) as T;

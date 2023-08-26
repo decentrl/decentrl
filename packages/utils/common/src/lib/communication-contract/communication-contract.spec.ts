@@ -1,7 +1,5 @@
 import { DidData } from '../did/did.interfaces';
-import {
-  DidDocument,
-} from '../did-document/did-document.interfaces';
+import { DidDocument } from '../did-document/did-document.interfaces';
 import { generateDid } from '../did/did';
 import {
   generateCommunicationContractSignatureRequest,
@@ -13,9 +11,12 @@ import * as didDocumentUtils from '../did-document/did-document';
 
 // eslint-disable-next-line @nx/enforce-module-boundaries
 import * as nodeUtils from '@decentrl/utils/node';
+// eslint-disable-next-line @nx/enforce-module-boundaries
+import * as webUtils from '@decentrl/utils/web';
 
 import { when } from 'jest-when';
 import { decryptPayload } from '../crypto/ecdh';
+import { Cryptography } from '../crypto/crypto.interfaces';
 
 const domain = 'registry.decentrl.network';
 
@@ -28,8 +29,8 @@ describe('Communication Contract', () => {
   beforeAll(async () => {
     requestorDidData = await generateDid(
       domain,
-      nodeUtils.generateP256ECDHKeyPair,
-      nodeUtils.generateP256KeyPair
+      webUtils.generateX25519KeyPair,
+      webUtils.generateEd25519KeyPair
     );
 
     requestorDidDocument =
@@ -37,8 +38,8 @@ describe('Communication Contract', () => {
 
     recipientDidData = await generateDid(
       domain,
-      nodeUtils.generateP256ECDHKeyPair,
-      nodeUtils.generateP256KeyPair
+      nodeUtils.generateX25519KeyPair,
+      nodeUtils.generateEd25519KeyPair
     );
 
     recipientDidDocument =
@@ -69,12 +70,14 @@ describe('Communication Contract', () => {
       await generateCommunicationContractSignatureRequest(
         requestorDidData,
         recipientDidData.did,
-        secretContractKey
+        secretContractKey,
+        Cryptography.BROWSER
       );
 
     const communicationContractRequestVerificationResult =
       await verifyCommunicationContractSignatureRequest(
-        signedCommunicationContractRequest
+        signedCommunicationContractRequest,
+        Cryptography.NODE
       );
 
     expect(communicationContractRequestVerificationResult).toStrictEqual({
@@ -90,11 +93,15 @@ describe('Communication Contract', () => {
 
     const signedCommunicationContract = await signCommunicationContract(
       signedCommunicationContractRequest,
-      recipientDidData
+      recipientDidData,
+      Cryptography.NODE
     );
 
     const communicationContractVerificationResult =
-      await verifyCommunicationContract(signedCommunicationContract);
+      await verifyCommunicationContract(
+        signedCommunicationContract,
+        Cryptography.NODE
+      );
 
     expect(communicationContractVerificationResult).toStrictEqual({
       requestorDidDocument,
@@ -108,17 +115,23 @@ describe('Communication Contract', () => {
     });
 
     const decryptedRecipientContractKey = await decryptPayload(
+      communicationContractVerificationResult.recipientEncryptedCommunicationSecretKey,
       recipientDidData.keys.encryptionKeyPair.private,
-      communicationContractVerificationResult.recipientEncryptedCommunicationSecretKey
+      Cryptography.NODE
     );
 
     const decryptedRequestorContractKey = await decryptPayload(
+      communicationContractVerificationResult.requestorEncryptedCommunicationSecretKey,
       requestorDidData.keys.encryptionKeyPair.private,
-      communicationContractVerificationResult.requestorEncryptedCommunicationSecretKey
+      Cryptography.BROWSER
     );
 
-    expect(decryptedRecipientContractKey).toStrictEqual(secretContractKey);
-    expect(decryptedRequestorContractKey).toStrictEqual(secretContractKey);
+    expect(decryptedRecipientContractKey.plaintext.toString()).toStrictEqual(
+      secretContractKey
+    );
+    expect(decryptedRequestorContractKey.plaintext.toString()).toStrictEqual(
+      secretContractKey
+    );
   });
 
   it('should fail communication contract request verification if it has expired', async () => {
@@ -129,12 +142,14 @@ describe('Communication Contract', () => {
         requestorDidData,
         recipientDidData.did,
         secretContractKey,
+        Cryptography.BROWSER,
         Date.now() / 1000 - 1
       );
 
     await expect(
       verifyCommunicationContractSignatureRequest(
-        expiredCommunicationContractRequest
+        expiredCommunicationContractRequest,
+        Cryptography.NODE
       )
     ).rejects.toThrowError(
       'Communication contract request invalid: Contract has expired.'
@@ -148,17 +163,22 @@ describe('Communication Contract', () => {
       await generateCommunicationContractSignatureRequest(
         requestorDidData,
         recipientDidData.did,
-        secretContractKey
+        secretContractKey,
+        Cryptography.BROWSER
       );
 
     const expiredCommunicationContract = await signCommunicationContract(
       communicationContractRequest,
       recipientDidData,
+      Cryptography.NODE,
       Date.now() / 1000 - 1
     );
 
     await expect(
-      verifyCommunicationContract(expiredCommunicationContract)
+      verifyCommunicationContract(
+        expiredCommunicationContract,
+        Cryptography.NODE
+      )
     ).rejects.toThrowError(
       'Communication contract invalid: Contract has expired.'
     );
