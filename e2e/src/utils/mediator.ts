@@ -8,24 +8,42 @@ import {
   MediatorCommunicationChannel,
   MediatorEvent,
   MediatorEventType,
-  MediatorRegisterCommandPayload,
-  MediatorRegisteredEventPayload,
   decryptPayload,
   generateMediatorCommand,
   readMediatorEventPayload,
+  MediatorRequestCommunicationContractCommandPayload,
+  generateCommunicationContractSignatureRequest,
+  MediatorCommunicationContractSignedEventPayload,
 } from '@decentrl/utils/common';
+import { randomBytesHex } from '@decentrl/utils/node';
 
 export const registerIdentityOnMediator = async (
   identityDidData: DidData,
   client: WebSocket,
   mediatorDidDocument: DidDocument
 ): Promise<void> => {
-  const registerCommandPayload =
-    await generateMediatorCommand<MediatorRegisterCommandPayload>(
+  const mediatorCommunicationContractRequest =
+    await generateCommunicationContractSignatureRequest(
+      identityDidData,
+      mediatorDidDocument.id,
+      randomBytesHex(32),
+      Cryptography.NODE,
+      undefined,
       {
-        name: MediatorCommandType.REGISTER,
+        communicationChannels: [
+          MediatorCommunicationChannel.ONE_WAY_PUBLIC,
+          MediatorCommunicationChannel.TWO_WAY_PRIVATE,
+        ],
+      }
+    );
+
+  const registerCommandPayload =
+    await generateMediatorCommand<MediatorRequestCommunicationContractCommandPayload>(
+      {
+        name: MediatorCommandType.REQUEST_COMMUNICATION_CONTRACT,
+        recipient: mediatorDidDocument.id,
         payload: {
-          communicationChannels: [MediatorCommunicationChannel.ONE_WAY_PUBLIC],
+          contract: mediatorCommunicationContractRequest,
         },
       },
       identityDidData,
@@ -48,7 +66,7 @@ export const registerIdentityOnMediator = async (
     });
   });
 
-  const eventPayload: MediatorRegisteredEventPayload =
+  const eventPayload: MediatorCommunicationContractSignedEventPayload =
     await readMediatorEventPayload(
       mediatorEventResponse,
       identityDidData,
@@ -59,7 +77,7 @@ export const registerIdentityOnMediator = async (
         } as any)
     );
 
-  if (eventPayload.name !== MediatorEventType.REGISTERED) {
+  if (eventPayload.name !== MediatorEventType.COMMUNICATION_CONTRACT_SIGNED) {
     throw new Error('Mediator did not register the identity');
   }
 };
@@ -68,14 +86,14 @@ export const listenToMediatorEvent = async <T>(
   identityDidData: DidData,
   ws: WebSocket
 ): Promise<T> => {
-  const payload: string = await new Promise((resolve) => {
+  const payload: string = await new Promise((resolve, reject) => {
     ws.on('message', (raw) => {
       const message = new StringDecoder('utf8').write(raw as any);
 
       const data = JSON.parse(message);
 
       if (data.type !== 'EVENT') {
-        return;
+        reject(new Error('ERROR'));
       }
 
       resolve(data.payload);

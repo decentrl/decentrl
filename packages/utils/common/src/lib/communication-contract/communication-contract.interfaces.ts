@@ -1,6 +1,8 @@
 import { DidDocument } from '../did-document/did-document.interfaces';
 
 export interface CommunicationContractRequest {
+  id: string;
+
   requestorDid: string;
   requestorPublicSigningKeyId: string;
 
@@ -9,7 +11,8 @@ export interface CommunicationContractRequest {
 
   recipientEncryptedCommunicationSecretKey: string;
 
-  contractExpiresAt?: number;
+  expiresAt?: number;
+  metadata?: Record<string, any>;
 }
 
 export interface CommunicationContractRequestVerificationResult {
@@ -17,10 +20,14 @@ export interface CommunicationContractRequestVerificationResult {
   communicationContractRequest: CommunicationContractRequest;
 }
 
+export interface CommunicationContractSignatureResult {
+  verificationResult: CommunicationContractRequestVerificationResult;
+  signature: string;
+}
+
 export interface CommunicationContract {
   requestorSignature: string;
   requestorEncryptedCommunicationSecretKey: string;
-  contractExpiresAt?: number;
 }
 
 export interface CommunicationContractVerificationResult {

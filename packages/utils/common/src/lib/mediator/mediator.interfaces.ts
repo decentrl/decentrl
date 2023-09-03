@@ -5,7 +5,6 @@ export enum MediatorCommunicationChannel {
 }
 
 export enum MediatorServiceType {
-  REGISTER = 'Register',
   COMMUNICATION_CONTRACT = 'CommunicationContract',
   COMMUNICATION = 'Communication',
   BACKLIST = 'Blacklist',
@@ -30,12 +29,6 @@ export interface MediatorCommunicationServiceEndpoint
   communicationChannels: MediatorCommunicationChannel[];
 }
 
-export interface MediatorRegisterService {
-  id: string;
-  type: `DecentrlMediator${MediatorServiceType.REGISTER}`;
-  serviceEndpoint: MediatorServiceEndpoint;
-}
-
 export interface MediatorCommunicationContractService {
   id: string;
   type: `DecentrlMediator${MediatorServiceType.COMMUNICATION_CONTRACT}`;
@@ -55,17 +48,19 @@ export enum MediatorMessageType {
 }
 
 export enum MediatorErrorReason {
-  NO_ENABLED_COMMUNICATION_CHANNELS = 'NO_ENABLED_COMMUNICATION_CHANNELS',
+  RECIPIENT_COMMUNICATION_CHANNEL_NOT_ENABLED = 'RECIPIENT_COMMUNICATION_CHANNEL_NOT_ENABLED',
   RECIPIENT_NOT_REGISTERED = 'RECIPIENT_NOT_REGISTERED',
   ENCRYPTED_PAYLOAD_MISSING = 'ENCRYPTED_PAYLOAD_MISSING',
   DID_RESOLUTION_FAILED = 'DID_RESOLUTION_FAILED',
   MESSAGE_UNWRAPPING_FAILED = 'MESSAGE_UNWRAPPING_FAILED',
   RESPONSE_ENCRYPTION_FAILED = 'RESPONSE_ENCRYPTION_FAILED',
-  NOT_REGISTERED = 'NOT_REGISTERED',
   COMMUNICATION_CONTRACT_NOT_VALID = 'COMMUNICATION_CONTRACT_NOT_VALID',
+  AUTHENTICATION_FAILED = 'AUTHENTICATION_FAILED',
 }
 
 export interface MediatorErrorEvent {
+  // Tracking ID
+  id?: string;
   type: MediatorMessageType.ERROR;
   reason: MediatorErrorReason;
 }
@@ -78,11 +73,14 @@ export interface MediatorEvent {
 }
 
 export enum MediatorEventType {
-  // Registration
-  REGISTERED = 'REGISTERED',
+  // Authentication
+  AUTHENTICATION_CHALLENGE_REQUESTED = 'AUTHENTICATION_CHALLENGE_REQUESTED',
+  AUTHENTICATED = 'AUTHENTICATED',
   // Communication contract signing
   COMMUNICATION_CONTRACT_REQUESTED = 'COMMUNICATION_CONTRACT_REQUESTED',
   COMMUNICATION_CONTRACT_SIGNED = 'COMMUNICATION_CONTRACT_SIGNED',
+  COMMUNICATION_CONTRACT_REJECTED = 'COMMUNICATION_CONTRACT_REJECTED',
+  COMMUNICATION_CONTRACT_REGISTERED = 'COMMUNICATION_CONTRACT_REGISTERED',
   // Query
   QUERY_EXECUTED = 'QUERY_EXECUTED',
   // Messaging
@@ -103,9 +101,14 @@ export interface MediatorCommand {
 }
 
 export enum MediatorCommandType {
-  REGISTER = 'REGISTER',
+  REQUEST_AUTHENTICATION_CHALLENGE = 'REQUEST_AUTHENTICATION_CHALLENGE',
+  AUTHENTICATE = 'AUTHENTICATE',
+
   REQUEST_COMMUNICATION_CONTRACT = 'REQUEST_COMMUNICATION_CONTRACT',
   SIGN_COMMUNICATION_CONTACT = 'SIGN_COMMUNICATION_CONTACT',
+  REJECT_COMMUNICATION_CONTRACT = 'REJECT_COMMUNICATION_CONTRACT',
+  REGISTER_COMMUNICATION_CONTRACT = 'REGISTER_COMMUNICATION_CONTRACT',
+
   MESSAGE = 'MESSAGE',
   QUERY = 'QUERY',
 }
@@ -114,15 +117,15 @@ export interface MediatorCommandPayload {
   name: MediatorCommandType;
   recipient?: string;
   communicationChannel?: MediatorCommunicationChannel;
-  payload: Record<string, any>;
+  payload?: Record<string, any>;
   metadata?: Record<string, any>;
 }
 
 export interface MediatorQueryFilters {
   sender?: string;
-  receiver?: string;
+  recipient?: string;
 
-  command?: string
+  command?: string;
 
   metadata?: Record<string, any>;
 
@@ -159,23 +162,6 @@ export interface MediatorQueryEventPayload {
 }
 
 /**
- * Registration
- */
-export interface MediatorRegisterCommandPayload {
-  name: MediatorCommandType.REGISTER;
-  payload: {
-    communicationChannels: MediatorCommunicationChannel[];
-  };
-}
-
-export interface MediatorRegisteredEventPayload {
-  name: MediatorEventType.REGISTERED;
-  payload: {
-    communicationChannels: MediatorCommunicationChannel[];
-  };
-}
-
-/**
  * Communication contract
  */
 export interface MediatorRequestCommunicationContractCommandPayload {
@@ -204,6 +190,58 @@ export interface SignCommunicationContractPayload {
 
 export interface MediatorCommunicationContractSignedEventPayload {
   name: MediatorEventType.COMMUNICATION_CONTRACT_SIGNED;
+  contract?: string;
+}
+
+export interface MediatorRejectCommunicationContractCommandPayload {
+  name: MediatorCommandType.REJECT_COMMUNICATION_CONTRACT,
+  recipient: string;
+  payload: RejectCommunicationContractPayload;
+}
+
+export interface RejectCommunicationContractPayload {
+  id: string;
+}
+
+export interface MediatorCommunicationContractRejectedEventPayload {
+  name: MediatorEventType.COMMUNICATION_CONTRACT_REJECTED;
+  reason?: string;
+}
+
+export interface MediatorRegisterCommunicationContractCommandPayload {
+  name: MediatorCommandType.REGISTER_COMMUNICATION_CONTRACT;
+  contract: RegisterCommunicationContractPayload;
+}
+
+export interface RegisterCommunicationContractPayload {
+  contract: string;
+}
+
+export interface MediatorCommunicationContractRegisteredEventPayload {
+  name: MediatorEventType.COMMUNICATION_CONTRACT_REGISTERED;
+}
+
+/**
+ * Authentication
+ */
+export interface MediatorRequestAuthenticationChallengeCommandPayload {
+  name: MediatorCommandType.REQUEST_AUTHENTICATION_CHALLENGE;
+}
+
+export interface MediatorAuthenticationChallengeRequestedEventPayload {
+  name: MediatorEventType.AUTHENTICATION_CHALLENGE_REQUESTED;
+  challenge: string;
+}
+
+export interface MediatorAuthenticateCommandPayload {
+  name: MediatorCommandType.AUTHENTICATE;
+  payload: {
+    signedChallenge: string;
+  };
+}
+
+export interface MediatorAuthenticatedEventPayload {
+  name: MediatorEventType.AUTHENTICATED;
 }
 
 /**
@@ -217,7 +255,8 @@ export interface MediatorCommunicationCommandPayload {
 /**
  * One way public communication
  */
-export interface MediatorOneWayPublicCommandPayload extends MediatorCommunicationCommandPayload {
+export interface MediatorOneWayPublicCommandPayload
+  extends MediatorCommunicationCommandPayload {
   communicationChannel: MediatorCommunicationChannel.ONE_WAY_PUBLIC;
   payload: Record<string, any>;
 }
@@ -225,7 +264,8 @@ export interface MediatorOneWayPublicCommandPayload extends MediatorCommunicatio
 /**
  * Two way private communication
  */
-export interface MediatorTwoWayPrivateCommandPayload extends MediatorCommunicationCommandPayload {
+export interface MediatorTwoWayPrivateCommandPayload
+  extends MediatorCommunicationCommandPayload {
   communicationChannel: MediatorCommunicationChannel.TWO_WAY_PRIVATE;
   recipient: string;
   payload: TwoWayPrivateCommandPayload;
@@ -233,7 +273,7 @@ export interface MediatorTwoWayPrivateCommandPayload extends MediatorCommunicati
 }
 
 export interface TwoWayPrivateCommandPayload {
-  signedCommunicationContract: string;
+  contract?: string;
   message: string;
 }
 

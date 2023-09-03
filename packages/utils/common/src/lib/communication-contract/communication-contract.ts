@@ -17,17 +17,20 @@ import {
   CommunicationContract,
   CommunicationContractRequest,
   CommunicationContractRequestVerificationResult,
+  CommunicationContractSignatureResult,
   CommunicationContractVerificationResult,
 } from './communication-contract.interfaces';
 import { decryptPayload, encryptPayload } from '../crypto/ecdh';
 import { Cryptography } from '../crypto/crypto.interfaces';
+import { v4 } from 'uuid';
 
 export async function generateCommunicationContractSignatureRequest(
   requestorDidData: DidData,
   recipientDid: string,
   secretContractKey: string,
   type: Cryptography,
-  expiresAt?: number
+  expiresAt?: number,
+  metadata?: Record<string, any>
 ): Promise<string> {
   const recipientDidResolutionResult = await resolveDidDocument(recipientDid);
   const recipientDidDocument =
@@ -69,12 +72,14 @@ export async function generateCommunicationContractSignatureRequest(
   );
 
   const communicationContract: CommunicationContractRequest = {
+    id: v4(),
     requestorDid: requestorDidData.did,
     requestorPublicSigningKeyId,
     recipientDid,
     recipientPublicSigningKeyId,
-    contractExpiresAt: expiresAt,
+    expiresAt: expiresAt,
     recipientEncryptedCommunicationSecretKey,
+    metadata,
   };
 
   const signedCommunicationContractRequest = await signPayload(
@@ -97,8 +102,8 @@ export async function verifyCommunicationContractSignatureRequest(
     );
 
   if (
-    communicationContractRequest.contractExpiresAt &&
-    communicationContractRequest.contractExpiresAt < Date.now() / 1000
+    communicationContractRequest.expiresAt &&
+    communicationContractRequest.expiresAt < Date.now() / 1000
   ) {
     throw new Error(
       `Communication contract request invalid: Contract has expired.`
@@ -144,9 +149,8 @@ export async function verifyCommunicationContractSignatureRequest(
 export async function signCommunicationContract(
   signedCommunicationContractRequest: string,
   recipientDidData: DidData,
-  type: Cryptography,
-  expiresAt?: number
-) {
+  type: Cryptography
+): Promise<CommunicationContractSignatureResult> {
   const verificationResult = await verifyCommunicationContractSignatureRequest(
     signedCommunicationContractRequest,
     type
@@ -181,7 +185,6 @@ export async function signCommunicationContract(
 
   const communicationContract: CommunicationContract = {
     requestorSignature: signedCommunicationContractRequest,
-    contractExpiresAt: expiresAt,
     requestorEncryptedCommunicationSecretKey,
   };
 
@@ -194,7 +197,10 @@ export async function signCommunicationContract(
     type
   );
 
-  return signedCommunicationContract;
+  return {
+    signature: signedCommunicationContract,
+    verificationResult,
+  };
 }
 
 export async function verifyCommunicationContract(
@@ -206,18 +212,21 @@ export async function verifyCommunicationContract(
       signedCommunicationContract
     );
 
-  if (
-    communicationContract.contractExpiresAt &&
-    communicationContract.contractExpiresAt < Date.now() / 1000
-  ) {
-    throw new Error(`Communication contract invalid: Contract has expired.`);
-  }
-
   const communicationContractRequestVerificationResult =
     await verifyCommunicationContractSignatureRequest(
       communicationContract.requestorSignature,
       type
     );
+
+  if (
+    communicationContractRequestVerificationResult.communicationContractRequest
+      .expiresAt &&
+    communicationContractRequestVerificationResult.communicationContractRequest
+      .expiresAt <
+      Date.now() / 1000
+  ) {
+    throw new Error(`Communication contract invalid: Contract has expired.`);
+  }
 
   const recipientDidResolutionResult = await resolveDidDocument(
     communicationContractRequestVerificationResult.communicationContractRequest

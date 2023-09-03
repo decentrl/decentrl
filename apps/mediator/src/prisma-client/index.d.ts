@@ -12,21 +12,6 @@ import $Extensions = runtime.Types.Extensions
 export type PrismaPromise<T> = $Public.PrismaPromise<T>
 
 
-export type RegisteredIdentitiesPayload<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
-  name: "RegisteredIdentities"
-  objects: {}
-  scalars: $Extensions.GetResult<{
-    did: string
-    communicationChannels: CommunicationChannel[]
-  }, ExtArgs["result"]["registeredIdentities"]>
-  composites: {}
-}
-
-/**
- * Model RegisteredIdentities
- * 
- */
-export type RegisteredIdentities = runtime.Types.DefaultSelection<RegisteredIdentitiesPayload>
 export type EventLogPayload<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
   name: "EventLog"
   objects: {}
@@ -48,6 +33,25 @@ export type EventLogPayload<ExtArgs extends $Extensions.Args = $Extensions.Defau
  * 
  */
 export type EventLog = runtime.Types.DefaultSelection<EventLogPayload>
+export type CommunicationContractPayload<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+  name: "CommunicationContract"
+  objects: {}
+  scalars: $Extensions.GetResult<{
+    id: string
+    contract: string
+    partyOne: string
+    partyTwo: string
+    expiresAt: Date | null
+    communicationChannels: CommunicationChannel[]
+  }, ExtArgs["result"]["communicationContract"]>
+  composites: {}
+}
+
+/**
+ * Model CommunicationContract
+ * 
+ */
+export type CommunicationContract = runtime.Types.DefaultSelection<CommunicationContractPayload>
 
 /**
  * Enums
@@ -69,8 +73,8 @@ export type CommunicationChannel = (typeof CommunicationChannel)[keyof typeof Co
  * @example
  * ```
  * const prisma = new PrismaClient()
- * // Fetch zero or more RegisteredIdentities
- * const registeredIdentities = await prisma.registeredIdentities.findMany()
+ * // Fetch zero or more EventLogs
+ * const eventLogs = await prisma.eventLog.findMany()
  * ```
  *
  * 
@@ -93,8 +97,8 @@ export class PrismaClient<
    * @example
    * ```
    * const prisma = new PrismaClient()
-   * // Fetch zero or more RegisteredIdentities
-   * const registeredIdentities = await prisma.registeredIdentities.findMany()
+   * // Fetch zero or more EventLogs
+   * const eventLogs = await prisma.eventLog.findMany()
    * ```
    *
    * 
@@ -188,16 +192,6 @@ export class PrismaClient<
   $extends: $Extensions.ExtendsHook<'extends', Prisma.TypeMapCb, ExtArgs>
 
       /**
-   * `prisma.registeredIdentities`: Exposes CRUD operations for the **RegisteredIdentities** model.
-    * Example usage:
-    * ```ts
-    * // Fetch zero or more RegisteredIdentities
-    * const registeredIdentities = await prisma.registeredIdentities.findMany()
-    * ```
-    */
-  get registeredIdentities(): Prisma.RegisteredIdentitiesDelegate<GlobalReject, ExtArgs>;
-
-  /**
    * `prisma.eventLog`: Exposes CRUD operations for the **EventLog** model.
     * Example usage:
     * ```ts
@@ -206,6 +200,16 @@ export class PrismaClient<
     * ```
     */
   get eventLog(): Prisma.EventLogDelegate<GlobalReject, ExtArgs>;
+
+  /**
+   * `prisma.communicationContract`: Exposes CRUD operations for the **CommunicationContract** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more CommunicationContracts
+    * const communicationContracts = await prisma.communicationContract.findMany()
+    * ```
+    */
+  get communicationContract(): Prisma.CommunicationContractDelegate<GlobalReject, ExtArgs>;
 }
 
 export namespace Prisma {
@@ -689,8 +693,8 @@ export namespace Prisma {
 
 
   export const ModelName: {
-    RegisteredIdentities: 'RegisteredIdentities',
-    EventLog: 'EventLog'
+    EventLog: 'EventLog',
+    CommunicationContract: 'CommunicationContract'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -707,75 +711,10 @@ export namespace Prisma {
 
   export type TypeMap<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
     meta: {
-      modelProps: 'registeredIdentities' | 'eventLog'
+      modelProps: 'eventLog' | 'communicationContract'
       txIsolationLevel: Prisma.TransactionIsolationLevel
     },
     model: {
-      RegisteredIdentities: {
-        payload: RegisteredIdentitiesPayload<ExtArgs>
-        operations: {
-          findUnique: {
-            args: Prisma.RegisteredIdentitiesFindUniqueArgs<ExtArgs>,
-            result: $Utils.PayloadToResult<RegisteredIdentitiesPayload> | null
-          }
-          findUniqueOrThrow: {
-            args: Prisma.RegisteredIdentitiesFindUniqueOrThrowArgs<ExtArgs>,
-            result: $Utils.PayloadToResult<RegisteredIdentitiesPayload>
-          }
-          findFirst: {
-            args: Prisma.RegisteredIdentitiesFindFirstArgs<ExtArgs>,
-            result: $Utils.PayloadToResult<RegisteredIdentitiesPayload> | null
-          }
-          findFirstOrThrow: {
-            args: Prisma.RegisteredIdentitiesFindFirstOrThrowArgs<ExtArgs>,
-            result: $Utils.PayloadToResult<RegisteredIdentitiesPayload>
-          }
-          findMany: {
-            args: Prisma.RegisteredIdentitiesFindManyArgs<ExtArgs>,
-            result: $Utils.PayloadToResult<RegisteredIdentitiesPayload>[]
-          }
-          create: {
-            args: Prisma.RegisteredIdentitiesCreateArgs<ExtArgs>,
-            result: $Utils.PayloadToResult<RegisteredIdentitiesPayload>
-          }
-          createMany: {
-            args: Prisma.RegisteredIdentitiesCreateManyArgs<ExtArgs>,
-            result: Prisma.BatchPayload
-          }
-          delete: {
-            args: Prisma.RegisteredIdentitiesDeleteArgs<ExtArgs>,
-            result: $Utils.PayloadToResult<RegisteredIdentitiesPayload>
-          }
-          update: {
-            args: Prisma.RegisteredIdentitiesUpdateArgs<ExtArgs>,
-            result: $Utils.PayloadToResult<RegisteredIdentitiesPayload>
-          }
-          deleteMany: {
-            args: Prisma.RegisteredIdentitiesDeleteManyArgs<ExtArgs>,
-            result: Prisma.BatchPayload
-          }
-          updateMany: {
-            args: Prisma.RegisteredIdentitiesUpdateManyArgs<ExtArgs>,
-            result: Prisma.BatchPayload
-          }
-          upsert: {
-            args: Prisma.RegisteredIdentitiesUpsertArgs<ExtArgs>,
-            result: $Utils.PayloadToResult<RegisteredIdentitiesPayload>
-          }
-          aggregate: {
-            args: Prisma.RegisteredIdentitiesAggregateArgs<ExtArgs>,
-            result: $Utils.Optional<AggregateRegisteredIdentities>
-          }
-          groupBy: {
-            args: Prisma.RegisteredIdentitiesGroupByArgs<ExtArgs>,
-            result: $Utils.Optional<RegisteredIdentitiesGroupByOutputType>[]
-          }
-          count: {
-            args: Prisma.RegisteredIdentitiesCountArgs<ExtArgs>,
-            result: $Utils.Optional<RegisteredIdentitiesCountAggregateOutputType> | number
-          }
-        }
-      }
       EventLog: {
         payload: EventLogPayload<ExtArgs>
         operations: {
@@ -838,6 +777,71 @@ export namespace Prisma {
           count: {
             args: Prisma.EventLogCountArgs<ExtArgs>,
             result: $Utils.Optional<EventLogCountAggregateOutputType> | number
+          }
+        }
+      }
+      CommunicationContract: {
+        payload: CommunicationContractPayload<ExtArgs>
+        operations: {
+          findUnique: {
+            args: Prisma.CommunicationContractFindUniqueArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<CommunicationContractPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.CommunicationContractFindUniqueOrThrowArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<CommunicationContractPayload>
+          }
+          findFirst: {
+            args: Prisma.CommunicationContractFindFirstArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<CommunicationContractPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.CommunicationContractFindFirstOrThrowArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<CommunicationContractPayload>
+          }
+          findMany: {
+            args: Prisma.CommunicationContractFindManyArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<CommunicationContractPayload>[]
+          }
+          create: {
+            args: Prisma.CommunicationContractCreateArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<CommunicationContractPayload>
+          }
+          createMany: {
+            args: Prisma.CommunicationContractCreateManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          delete: {
+            args: Prisma.CommunicationContractDeleteArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<CommunicationContractPayload>
+          }
+          update: {
+            args: Prisma.CommunicationContractUpdateArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<CommunicationContractPayload>
+          }
+          deleteMany: {
+            args: Prisma.CommunicationContractDeleteManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          updateMany: {
+            args: Prisma.CommunicationContractUpdateManyArgs<ExtArgs>,
+            result: Prisma.BatchPayload
+          }
+          upsert: {
+            args: Prisma.CommunicationContractUpsertArgs<ExtArgs>,
+            result: $Utils.PayloadToResult<CommunicationContractPayload>
+          }
+          aggregate: {
+            args: Prisma.CommunicationContractAggregateArgs<ExtArgs>,
+            result: $Utils.Optional<AggregateCommunicationContract>
+          }
+          groupBy: {
+            args: Prisma.CommunicationContractGroupByArgs<ExtArgs>,
+            result: $Utils.Optional<CommunicationContractGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.CommunicationContractCountArgs<ExtArgs>,
+            result: $Utils.Optional<CommunicationContractCountAggregateOutputType> | number
           }
         }
       }
@@ -1021,853 +1025,6 @@ export namespace Prisma {
   /**
    * Models
    */
-
-  /**
-   * Model RegisteredIdentities
-   */
-
-
-  export type AggregateRegisteredIdentities = {
-    _count: RegisteredIdentitiesCountAggregateOutputType | null
-    _min: RegisteredIdentitiesMinAggregateOutputType | null
-    _max: RegisteredIdentitiesMaxAggregateOutputType | null
-  }
-
-  export type RegisteredIdentitiesMinAggregateOutputType = {
-    did: string | null
-  }
-
-  export type RegisteredIdentitiesMaxAggregateOutputType = {
-    did: string | null
-  }
-
-  export type RegisteredIdentitiesCountAggregateOutputType = {
-    did: number
-    communicationChannels: number
-    _all: number
-  }
-
-
-  export type RegisteredIdentitiesMinAggregateInputType = {
-    did?: true
-  }
-
-  export type RegisteredIdentitiesMaxAggregateInputType = {
-    did?: true
-  }
-
-  export type RegisteredIdentitiesCountAggregateInputType = {
-    did?: true
-    communicationChannels?: true
-    _all?: true
-  }
-
-  export type RegisteredIdentitiesAggregateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which RegisteredIdentities to aggregate.
-     */
-    where?: RegisteredIdentitiesWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of RegisteredIdentities to fetch.
-     */
-    orderBy?: Enumerable<RegisteredIdentitiesOrderByWithRelationInput>
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the start position
-     */
-    cursor?: RegisteredIdentitiesWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` RegisteredIdentities from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` RegisteredIdentities.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Count returned RegisteredIdentities
-    **/
-    _count?: true | RegisteredIdentitiesCountAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the minimum value
-    **/
-    _min?: RegisteredIdentitiesMinAggregateInputType
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
-     * 
-     * Select which fields to find the maximum value
-    **/
-    _max?: RegisteredIdentitiesMaxAggregateInputType
-  }
-
-  export type GetRegisteredIdentitiesAggregateType<T extends RegisteredIdentitiesAggregateArgs> = {
-        [P in keyof T & keyof AggregateRegisteredIdentities]: P extends '_count' | 'count'
-      ? T[P] extends true
-        ? number
-        : GetScalarType<T[P], AggregateRegisteredIdentities[P]>
-      : GetScalarType<T[P], AggregateRegisteredIdentities[P]>
-  }
-
-
-
-
-  export type RegisteredIdentitiesGroupByArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
-    where?: RegisteredIdentitiesWhereInput
-    orderBy?: Enumerable<RegisteredIdentitiesOrderByWithAggregationInput>
-    by: RegisteredIdentitiesScalarFieldEnum[]
-    having?: RegisteredIdentitiesScalarWhereWithAggregatesInput
-    take?: number
-    skip?: number
-    _count?: RegisteredIdentitiesCountAggregateInputType | true
-    _min?: RegisteredIdentitiesMinAggregateInputType
-    _max?: RegisteredIdentitiesMaxAggregateInputType
-  }
-
-
-  export type RegisteredIdentitiesGroupByOutputType = {
-    did: string
-    communicationChannels: CommunicationChannel[]
-    _count: RegisteredIdentitiesCountAggregateOutputType | null
-    _min: RegisteredIdentitiesMinAggregateOutputType | null
-    _max: RegisteredIdentitiesMaxAggregateOutputType | null
-  }
-
-  type GetRegisteredIdentitiesGroupByPayload<T extends RegisteredIdentitiesGroupByArgs> = Prisma.PrismaPromise<
-    Array<
-      PickArray<RegisteredIdentitiesGroupByOutputType, T['by']> &
-        {
-          [P in ((keyof T) & (keyof RegisteredIdentitiesGroupByOutputType))]: P extends '_count'
-            ? T[P] extends boolean
-              ? number
-              : GetScalarType<T[P], RegisteredIdentitiesGroupByOutputType[P]>
-            : GetScalarType<T[P], RegisteredIdentitiesGroupByOutputType[P]>
-        }
-      >
-    >
-
-
-  export type RegisteredIdentitiesSelect<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
-    did?: boolean
-    communicationChannels?: boolean
-  }, ExtArgs["result"]["registeredIdentities"]>
-
-  export type RegisteredIdentitiesSelectScalar = {
-    did?: boolean
-    communicationChannels?: boolean
-  }
-
-
-  type RegisteredIdentitiesGetPayload<S extends boolean | null | undefined | RegisteredIdentitiesArgs> = $Types.GetResult<RegisteredIdentitiesPayload, S>
-
-  type RegisteredIdentitiesCountArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = 
-    Omit<RegisteredIdentitiesFindManyArgs, 'select' | 'include'> & {
-      select?: RegisteredIdentitiesCountAggregateInputType | true
-    }
-
-  export interface RegisteredIdentitiesDelegate<GlobalRejectSettings extends Prisma.RejectOnNotFound | Prisma.RejectPerOperation | false | undefined, ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> {
-    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['RegisteredIdentities'], meta: { name: 'RegisteredIdentities' } }
-    /**
-     * Find zero or one RegisteredIdentities that matches the filter.
-     * @param {RegisteredIdentitiesFindUniqueArgs} args - Arguments to find a RegisteredIdentities
-     * @example
-     * // Get one RegisteredIdentities
-     * const registeredIdentities = await prisma.registeredIdentities.findUnique({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-    **/
-    findUnique<T extends RegisteredIdentitiesFindUniqueArgs<ExtArgs>, LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
-      args: SelectSubset<T, RegisteredIdentitiesFindUniqueArgs<ExtArgs>>
-    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findUnique', 'RegisteredIdentities'> extends True ? Prisma__RegisteredIdentitiesClient<$Types.GetResult<RegisteredIdentitiesPayload<ExtArgs>, T, 'findUnique', never>, never, ExtArgs> : Prisma__RegisteredIdentitiesClient<$Types.GetResult<RegisteredIdentitiesPayload<ExtArgs>, T, 'findUnique', never> | null, null, ExtArgs>
-
-    /**
-     * Find one RegisteredIdentities that matches the filter or throw an error  with `error.code='P2025'` 
-     *     if no matches were found.
-     * @param {RegisteredIdentitiesFindUniqueOrThrowArgs} args - Arguments to find a RegisteredIdentities
-     * @example
-     * // Get one RegisteredIdentities
-     * const registeredIdentities = await prisma.registeredIdentities.findUniqueOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-    **/
-    findUniqueOrThrow<T extends RegisteredIdentitiesFindUniqueOrThrowArgs<ExtArgs>>(
-      args?: SelectSubset<T, RegisteredIdentitiesFindUniqueOrThrowArgs<ExtArgs>>
-    ): Prisma__RegisteredIdentitiesClient<$Types.GetResult<RegisteredIdentitiesPayload<ExtArgs>, T, 'findUniqueOrThrow', never>, never, ExtArgs>
-
-    /**
-     * Find the first RegisteredIdentities that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {RegisteredIdentitiesFindFirstArgs} args - Arguments to find a RegisteredIdentities
-     * @example
-     * // Get one RegisteredIdentities
-     * const registeredIdentities = await prisma.registeredIdentities.findFirst({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-    **/
-    findFirst<T extends RegisteredIdentitiesFindFirstArgs<ExtArgs>, LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
-      args?: SelectSubset<T, RegisteredIdentitiesFindFirstArgs<ExtArgs>>
-    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findFirst', 'RegisteredIdentities'> extends True ? Prisma__RegisteredIdentitiesClient<$Types.GetResult<RegisteredIdentitiesPayload<ExtArgs>, T, 'findFirst', never>, never, ExtArgs> : Prisma__RegisteredIdentitiesClient<$Types.GetResult<RegisteredIdentitiesPayload<ExtArgs>, T, 'findFirst', never> | null, null, ExtArgs>
-
-    /**
-     * Find the first RegisteredIdentities that matches the filter or
-     * throw `NotFoundError` if no matches were found.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {RegisteredIdentitiesFindFirstOrThrowArgs} args - Arguments to find a RegisteredIdentities
-     * @example
-     * // Get one RegisteredIdentities
-     * const registeredIdentities = await prisma.registeredIdentities.findFirstOrThrow({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-    **/
-    findFirstOrThrow<T extends RegisteredIdentitiesFindFirstOrThrowArgs<ExtArgs>>(
-      args?: SelectSubset<T, RegisteredIdentitiesFindFirstOrThrowArgs<ExtArgs>>
-    ): Prisma__RegisteredIdentitiesClient<$Types.GetResult<RegisteredIdentitiesPayload<ExtArgs>, T, 'findFirstOrThrow', never>, never, ExtArgs>
-
-    /**
-     * Find zero or more RegisteredIdentities that matches the filter.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {RegisteredIdentitiesFindManyArgs=} args - Arguments to filter and select certain fields only.
-     * @example
-     * // Get all RegisteredIdentities
-     * const registeredIdentities = await prisma.registeredIdentities.findMany()
-     * 
-     * // Get first 10 RegisteredIdentities
-     * const registeredIdentities = await prisma.registeredIdentities.findMany({ take: 10 })
-     * 
-     * // Only select the `did`
-     * const registeredIdentitiesWithDidOnly = await prisma.registeredIdentities.findMany({ select: { did: true } })
-     * 
-    **/
-    findMany<T extends RegisteredIdentitiesFindManyArgs<ExtArgs>>(
-      args?: SelectSubset<T, RegisteredIdentitiesFindManyArgs<ExtArgs>>
-    ): Prisma.PrismaPromise<$Types.GetResult<RegisteredIdentitiesPayload<ExtArgs>, T, 'findMany', never>>
-
-    /**
-     * Create a RegisteredIdentities.
-     * @param {RegisteredIdentitiesCreateArgs} args - Arguments to create a RegisteredIdentities.
-     * @example
-     * // Create one RegisteredIdentities
-     * const RegisteredIdentities = await prisma.registeredIdentities.create({
-     *   data: {
-     *     // ... data to create a RegisteredIdentities
-     *   }
-     * })
-     * 
-    **/
-    create<T extends RegisteredIdentitiesCreateArgs<ExtArgs>>(
-      args: SelectSubset<T, RegisteredIdentitiesCreateArgs<ExtArgs>>
-    ): Prisma__RegisteredIdentitiesClient<$Types.GetResult<RegisteredIdentitiesPayload<ExtArgs>, T, 'create', never>, never, ExtArgs>
-
-    /**
-     * Create many RegisteredIdentities.
-     *     @param {RegisteredIdentitiesCreateManyArgs} args - Arguments to create many RegisteredIdentities.
-     *     @example
-     *     // Create many RegisteredIdentities
-     *     const registeredIdentities = await prisma.registeredIdentities.createMany({
-     *       data: {
-     *         // ... provide data here
-     *       }
-     *     })
-     *     
-    **/
-    createMany<T extends RegisteredIdentitiesCreateManyArgs<ExtArgs>>(
-      args?: SelectSubset<T, RegisteredIdentitiesCreateManyArgs<ExtArgs>>
-    ): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Delete a RegisteredIdentities.
-     * @param {RegisteredIdentitiesDeleteArgs} args - Arguments to delete one RegisteredIdentities.
-     * @example
-     * // Delete one RegisteredIdentities
-     * const RegisteredIdentities = await prisma.registeredIdentities.delete({
-     *   where: {
-     *     // ... filter to delete one RegisteredIdentities
-     *   }
-     * })
-     * 
-    **/
-    delete<T extends RegisteredIdentitiesDeleteArgs<ExtArgs>>(
-      args: SelectSubset<T, RegisteredIdentitiesDeleteArgs<ExtArgs>>
-    ): Prisma__RegisteredIdentitiesClient<$Types.GetResult<RegisteredIdentitiesPayload<ExtArgs>, T, 'delete', never>, never, ExtArgs>
-
-    /**
-     * Update one RegisteredIdentities.
-     * @param {RegisteredIdentitiesUpdateArgs} args - Arguments to update one RegisteredIdentities.
-     * @example
-     * // Update one RegisteredIdentities
-     * const registeredIdentities = await prisma.registeredIdentities.update({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-    **/
-    update<T extends RegisteredIdentitiesUpdateArgs<ExtArgs>>(
-      args: SelectSubset<T, RegisteredIdentitiesUpdateArgs<ExtArgs>>
-    ): Prisma__RegisteredIdentitiesClient<$Types.GetResult<RegisteredIdentitiesPayload<ExtArgs>, T, 'update', never>, never, ExtArgs>
-
-    /**
-     * Delete zero or more RegisteredIdentities.
-     * @param {RegisteredIdentitiesDeleteManyArgs} args - Arguments to filter RegisteredIdentities to delete.
-     * @example
-     * // Delete a few RegisteredIdentities
-     * const { count } = await prisma.registeredIdentities.deleteMany({
-     *   where: {
-     *     // ... provide filter here
-     *   }
-     * })
-     * 
-    **/
-    deleteMany<T extends RegisteredIdentitiesDeleteManyArgs<ExtArgs>>(
-      args?: SelectSubset<T, RegisteredIdentitiesDeleteManyArgs<ExtArgs>>
-    ): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Update zero or more RegisteredIdentities.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {RegisteredIdentitiesUpdateManyArgs} args - Arguments to update one or more rows.
-     * @example
-     * // Update many RegisteredIdentities
-     * const registeredIdentities = await prisma.registeredIdentities.updateMany({
-     *   where: {
-     *     // ... provide filter here
-     *   },
-     *   data: {
-     *     // ... provide data here
-     *   }
-     * })
-     * 
-    **/
-    updateMany<T extends RegisteredIdentitiesUpdateManyArgs<ExtArgs>>(
-      args: SelectSubset<T, RegisteredIdentitiesUpdateManyArgs<ExtArgs>>
-    ): Prisma.PrismaPromise<BatchPayload>
-
-    /**
-     * Create or update one RegisteredIdentities.
-     * @param {RegisteredIdentitiesUpsertArgs} args - Arguments to update or create a RegisteredIdentities.
-     * @example
-     * // Update or create a RegisteredIdentities
-     * const registeredIdentities = await prisma.registeredIdentities.upsert({
-     *   create: {
-     *     // ... data to create a RegisteredIdentities
-     *   },
-     *   update: {
-     *     // ... in case it already exists, update
-     *   },
-     *   where: {
-     *     // ... the filter for the RegisteredIdentities we want to update
-     *   }
-     * })
-    **/
-    upsert<T extends RegisteredIdentitiesUpsertArgs<ExtArgs>>(
-      args: SelectSubset<T, RegisteredIdentitiesUpsertArgs<ExtArgs>>
-    ): Prisma__RegisteredIdentitiesClient<$Types.GetResult<RegisteredIdentitiesPayload<ExtArgs>, T, 'upsert', never>, never, ExtArgs>
-
-    /**
-     * Count the number of RegisteredIdentities.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {RegisteredIdentitiesCountArgs} args - Arguments to filter RegisteredIdentities to count.
-     * @example
-     * // Count the number of RegisteredIdentities
-     * const count = await prisma.registeredIdentities.count({
-     *   where: {
-     *     // ... the filter for the RegisteredIdentities we want to count
-     *   }
-     * })
-    **/
-    count<T extends RegisteredIdentitiesCountArgs>(
-      args?: Subset<T, RegisteredIdentitiesCountArgs>,
-    ): Prisma.PrismaPromise<
-      T extends $Utils.Record<'select', any>
-        ? T['select'] extends true
-          ? number
-          : GetScalarType<T['select'], RegisteredIdentitiesCountAggregateOutputType>
-        : number
-    >
-
-    /**
-     * Allows you to perform aggregations operations on a RegisteredIdentities.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {RegisteredIdentitiesAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
-     * @example
-     * // Ordered by age ascending
-     * // Where email contains prisma.io
-     * // Limited to the 10 users
-     * const aggregations = await prisma.user.aggregate({
-     *   _avg: {
-     *     age: true,
-     *   },
-     *   where: {
-     *     email: {
-     *       contains: "prisma.io",
-     *     },
-     *   },
-     *   orderBy: {
-     *     age: "asc",
-     *   },
-     *   take: 10,
-     * })
-    **/
-    aggregate<T extends RegisteredIdentitiesAggregateArgs>(args: Subset<T, RegisteredIdentitiesAggregateArgs>): Prisma.PrismaPromise<GetRegisteredIdentitiesAggregateType<T>>
-
-    /**
-     * Group by RegisteredIdentities.
-     * Note, that providing `undefined` is treated as the value not being there.
-     * Read more here: https://pris.ly/d/null-undefined
-     * @param {RegisteredIdentitiesGroupByArgs} args - Group by arguments.
-     * @example
-     * // Group by city, order by createdAt, get count
-     * const result = await prisma.user.groupBy({
-     *   by: ['city', 'createdAt'],
-     *   orderBy: {
-     *     createdAt: true
-     *   },
-     *   _count: {
-     *     _all: true
-     *   },
-     * })
-     * 
-    **/
-    groupBy<
-      T extends RegisteredIdentitiesGroupByArgs,
-      HasSelectOrTake extends Or<
-        Extends<'skip', Keys<T>>,
-        Extends<'take', Keys<T>>
-      >,
-      OrderByArg extends True extends HasSelectOrTake
-        ? { orderBy: RegisteredIdentitiesGroupByArgs['orderBy'] }
-        : { orderBy?: RegisteredIdentitiesGroupByArgs['orderBy'] },
-      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
-      ByFields extends TupleToUnion<T['by']>,
-      ByValid extends Has<ByFields, OrderFields>,
-      HavingFields extends GetHavingFields<T['having']>,
-      HavingValid extends Has<ByFields, HavingFields>,
-      ByEmpty extends T['by'] extends never[] ? True : False,
-      InputErrors extends ByEmpty extends True
-      ? `Error: "by" must not be empty.`
-      : HavingValid extends False
-      ? {
-          [P in HavingFields]: P extends ByFields
-            ? never
-            : P extends string
-            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
-            : [
-                Error,
-                'Field ',
-                P,
-                ` in "having" needs to be provided in "by"`,
-              ]
-        }[HavingFields]
-      : 'take' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "take", you also need to provide "orderBy"'
-      : 'skip' extends Keys<T>
-      ? 'orderBy' extends Keys<T>
-        ? ByValid extends True
-          ? {}
-          : {
-              [P in OrderFields]: P extends ByFields
-                ? never
-                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-            }[OrderFields]
-        : 'Error: If you provide "skip", you also need to provide "orderBy"'
-      : ByValid extends True
-      ? {}
-      : {
-          [P in OrderFields]: P extends ByFields
-            ? never
-            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
-        }[OrderFields]
-    >(args: SubsetIntersection<T, RegisteredIdentitiesGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetRegisteredIdentitiesGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
-
-  }
-
-  /**
-   * The delegate class that acts as a "Promise-like" for RegisteredIdentities.
-   * Why is this prefixed with `Prisma__`?
-   * Because we want to prevent naming conflicts as mentioned in
-   * https://github.com/prisma/prisma-client-js/issues/707
-   */
-  export class Prisma__RegisteredIdentitiesClient<T, Null = never, ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> implements Prisma.PrismaPromise<T> {
-    private readonly _dmmf;
-    private readonly _queryType;
-    private readonly _rootField;
-    private readonly _clientMethod;
-    private readonly _args;
-    private readonly _dataPath;
-    private readonly _errorFormat;
-    private readonly _measurePerformance?;
-    private _isList;
-    private _callsite;
-    private _requestPromise?;
-    readonly [Symbol.toStringTag]: 'PrismaPromise';
-    constructor(_dmmf: runtime.DMMFClass, _queryType: 'query' | 'mutation', _rootField: string, _clientMethod: string, _args: any, _dataPath: string[], _errorFormat: ErrorFormat, _measurePerformance?: boolean | undefined, _isList?: boolean);
-
-
-    private get _document();
-    /**
-     * Attaches callbacks for the resolution and/or rejection of the Promise.
-     * @param onfulfilled The callback to execute when the Promise is resolved.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of which ever callback is executed.
-     */
-    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
-    /**
-     * Attaches a callback for only the rejection of the Promise.
-     * @param onrejected The callback to execute when the Promise is rejected.
-     * @returns A Promise for the completion of the callback.
-     */
-    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
-    /**
-     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
-     * resolved value cannot be modified from the callback.
-     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
-     * @returns A Promise for the completion of the callback.
-     */
-    finally(onfinally?: (() => void) | undefined | null): Promise<T>;
-  }
-
-
-
-  // Custom InputTypes
-
-  /**
-   * RegisteredIdentities base type for findUnique actions
-   */
-  export type RegisteredIdentitiesFindUniqueArgsBase<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the RegisteredIdentities
-     */
-    select?: RegisteredIdentitiesSelect<ExtArgs> | null
-    /**
-     * Filter, which RegisteredIdentities to fetch.
-     */
-    where: RegisteredIdentitiesWhereUniqueInput
-  }
-
-  /**
-   * RegisteredIdentities findUnique
-   */
-  export interface RegisteredIdentitiesFindUniqueArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> extends RegisteredIdentitiesFindUniqueArgsBase<ExtArgs> {
-   /**
-    * Throw an Error if query returns no results
-    * @deprecated since 4.0.0: use `findUniqueOrThrow` method instead
-    */
-    rejectOnNotFound?: RejectOnNotFound
-  }
-      
-
-  /**
-   * RegisteredIdentities findUniqueOrThrow
-   */
-  export type RegisteredIdentitiesFindUniqueOrThrowArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the RegisteredIdentities
-     */
-    select?: RegisteredIdentitiesSelect<ExtArgs> | null
-    /**
-     * Filter, which RegisteredIdentities to fetch.
-     */
-    where: RegisteredIdentitiesWhereUniqueInput
-  }
-
-
-  /**
-   * RegisteredIdentities base type for findFirst actions
-   */
-  export type RegisteredIdentitiesFindFirstArgsBase<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the RegisteredIdentities
-     */
-    select?: RegisteredIdentitiesSelect<ExtArgs> | null
-    /**
-     * Filter, which RegisteredIdentities to fetch.
-     */
-    where?: RegisteredIdentitiesWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of RegisteredIdentities to fetch.
-     */
-    orderBy?: Enumerable<RegisteredIdentitiesOrderByWithRelationInput>
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for RegisteredIdentities.
-     */
-    cursor?: RegisteredIdentitiesWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` RegisteredIdentities from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` RegisteredIdentities.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of RegisteredIdentities.
-     */
-    distinct?: Enumerable<RegisteredIdentitiesScalarFieldEnum>
-  }
-
-  /**
-   * RegisteredIdentities findFirst
-   */
-  export interface RegisteredIdentitiesFindFirstArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> extends RegisteredIdentitiesFindFirstArgsBase<ExtArgs> {
-   /**
-    * Throw an Error if query returns no results
-    * @deprecated since 4.0.0: use `findFirstOrThrow` method instead
-    */
-    rejectOnNotFound?: RejectOnNotFound
-  }
-      
-
-  /**
-   * RegisteredIdentities findFirstOrThrow
-   */
-  export type RegisteredIdentitiesFindFirstOrThrowArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the RegisteredIdentities
-     */
-    select?: RegisteredIdentitiesSelect<ExtArgs> | null
-    /**
-     * Filter, which RegisteredIdentities to fetch.
-     */
-    where?: RegisteredIdentitiesWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of RegisteredIdentities to fetch.
-     */
-    orderBy?: Enumerable<RegisteredIdentitiesOrderByWithRelationInput>
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for searching for RegisteredIdentities.
-     */
-    cursor?: RegisteredIdentitiesWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` RegisteredIdentities from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` RegisteredIdentities.
-     */
-    skip?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
-     * 
-     * Filter by unique combinations of RegisteredIdentities.
-     */
-    distinct?: Enumerable<RegisteredIdentitiesScalarFieldEnum>
-  }
-
-
-  /**
-   * RegisteredIdentities findMany
-   */
-  export type RegisteredIdentitiesFindManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the RegisteredIdentities
-     */
-    select?: RegisteredIdentitiesSelect<ExtArgs> | null
-    /**
-     * Filter, which RegisteredIdentities to fetch.
-     */
-    where?: RegisteredIdentitiesWhereInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
-     * 
-     * Determine the order of RegisteredIdentities to fetch.
-     */
-    orderBy?: Enumerable<RegisteredIdentitiesOrderByWithRelationInput>
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
-     * 
-     * Sets the position for listing RegisteredIdentities.
-     */
-    cursor?: RegisteredIdentitiesWhereUniqueInput
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Take `±n` RegisteredIdentities from the position of the cursor.
-     */
-    take?: number
-    /**
-     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
-     * 
-     * Skip the first `n` RegisteredIdentities.
-     */
-    skip?: number
-    distinct?: Enumerable<RegisteredIdentitiesScalarFieldEnum>
-  }
-
-
-  /**
-   * RegisteredIdentities create
-   */
-  export type RegisteredIdentitiesCreateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the RegisteredIdentities
-     */
-    select?: RegisteredIdentitiesSelect<ExtArgs> | null
-    /**
-     * The data needed to create a RegisteredIdentities.
-     */
-    data: XOR<RegisteredIdentitiesCreateInput, RegisteredIdentitiesUncheckedCreateInput>
-  }
-
-
-  /**
-   * RegisteredIdentities createMany
-   */
-  export type RegisteredIdentitiesCreateManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to create many RegisteredIdentities.
-     */
-    data: Enumerable<RegisteredIdentitiesCreateManyInput>
-    skipDuplicates?: boolean
-  }
-
-
-  /**
-   * RegisteredIdentities update
-   */
-  export type RegisteredIdentitiesUpdateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the RegisteredIdentities
-     */
-    select?: RegisteredIdentitiesSelect<ExtArgs> | null
-    /**
-     * The data needed to update a RegisteredIdentities.
-     */
-    data: XOR<RegisteredIdentitiesUpdateInput, RegisteredIdentitiesUncheckedUpdateInput>
-    /**
-     * Choose, which RegisteredIdentities to update.
-     */
-    where: RegisteredIdentitiesWhereUniqueInput
-  }
-
-
-  /**
-   * RegisteredIdentities updateMany
-   */
-  export type RegisteredIdentitiesUpdateManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
-    /**
-     * The data used to update RegisteredIdentities.
-     */
-    data: XOR<RegisteredIdentitiesUpdateManyMutationInput, RegisteredIdentitiesUncheckedUpdateManyInput>
-    /**
-     * Filter which RegisteredIdentities to update
-     */
-    where?: RegisteredIdentitiesWhereInput
-  }
-
-
-  /**
-   * RegisteredIdentities upsert
-   */
-  export type RegisteredIdentitiesUpsertArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the RegisteredIdentities
-     */
-    select?: RegisteredIdentitiesSelect<ExtArgs> | null
-    /**
-     * The filter to search for the RegisteredIdentities to update in case it exists.
-     */
-    where: RegisteredIdentitiesWhereUniqueInput
-    /**
-     * In case the RegisteredIdentities found by the `where` argument doesn't exist, create a new RegisteredIdentities with this data.
-     */
-    create: XOR<RegisteredIdentitiesCreateInput, RegisteredIdentitiesUncheckedCreateInput>
-    /**
-     * In case the RegisteredIdentities was found with the provided `where` argument, update it with this data.
-     */
-    update: XOR<RegisteredIdentitiesUpdateInput, RegisteredIdentitiesUncheckedUpdateInput>
-  }
-
-
-  /**
-   * RegisteredIdentities delete
-   */
-  export type RegisteredIdentitiesDeleteArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the RegisteredIdentities
-     */
-    select?: RegisteredIdentitiesSelect<ExtArgs> | null
-    /**
-     * Filter which RegisteredIdentities to delete.
-     */
-    where: RegisteredIdentitiesWhereUniqueInput
-  }
-
-
-  /**
-   * RegisteredIdentities deleteMany
-   */
-  export type RegisteredIdentitiesDeleteManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
-    /**
-     * Filter which RegisteredIdentities to delete
-     */
-    where?: RegisteredIdentitiesWhereInput
-  }
-
-
-  /**
-   * RegisteredIdentities without action
-   */
-  export type RegisteredIdentitiesArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the RegisteredIdentities
-     */
-    select?: RegisteredIdentitiesSelect<ExtArgs> | null
-  }
-
-
 
   /**
    * Model EventLog
@@ -2767,6 +1924,889 @@ export namespace Prisma {
 
 
   /**
+   * Model CommunicationContract
+   */
+
+
+  export type AggregateCommunicationContract = {
+    _count: CommunicationContractCountAggregateOutputType | null
+    _min: CommunicationContractMinAggregateOutputType | null
+    _max: CommunicationContractMaxAggregateOutputType | null
+  }
+
+  export type CommunicationContractMinAggregateOutputType = {
+    id: string | null
+    contract: string | null
+    partyOne: string | null
+    partyTwo: string | null
+    expiresAt: Date | null
+  }
+
+  export type CommunicationContractMaxAggregateOutputType = {
+    id: string | null
+    contract: string | null
+    partyOne: string | null
+    partyTwo: string | null
+    expiresAt: Date | null
+  }
+
+  export type CommunicationContractCountAggregateOutputType = {
+    id: number
+    contract: number
+    partyOne: number
+    partyTwo: number
+    expiresAt: number
+    communicationChannels: number
+    _all: number
+  }
+
+
+  export type CommunicationContractMinAggregateInputType = {
+    id?: true
+    contract?: true
+    partyOne?: true
+    partyTwo?: true
+    expiresAt?: true
+  }
+
+  export type CommunicationContractMaxAggregateInputType = {
+    id?: true
+    contract?: true
+    partyOne?: true
+    partyTwo?: true
+    expiresAt?: true
+  }
+
+  export type CommunicationContractCountAggregateInputType = {
+    id?: true
+    contract?: true
+    partyOne?: true
+    partyTwo?: true
+    expiresAt?: true
+    communicationChannels?: true
+    _all?: true
+  }
+
+  export type CommunicationContractAggregateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CommunicationContract to aggregate.
+     */
+    where?: CommunicationContractWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CommunicationContracts to fetch.
+     */
+    orderBy?: Enumerable<CommunicationContractOrderByWithRelationInput>
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: CommunicationContractWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CommunicationContracts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CommunicationContracts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned CommunicationContracts
+    **/
+    _count?: true | CommunicationContractCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: CommunicationContractMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: CommunicationContractMaxAggregateInputType
+  }
+
+  export type GetCommunicationContractAggregateType<T extends CommunicationContractAggregateArgs> = {
+        [P in keyof T & keyof AggregateCommunicationContract]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateCommunicationContract[P]>
+      : GetScalarType<T[P], AggregateCommunicationContract[P]>
+  }
+
+
+
+
+  export type CommunicationContractGroupByArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    where?: CommunicationContractWhereInput
+    orderBy?: Enumerable<CommunicationContractOrderByWithAggregationInput>
+    by: CommunicationContractScalarFieldEnum[]
+    having?: CommunicationContractScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: CommunicationContractCountAggregateInputType | true
+    _min?: CommunicationContractMinAggregateInputType
+    _max?: CommunicationContractMaxAggregateInputType
+  }
+
+
+  export type CommunicationContractGroupByOutputType = {
+    id: string
+    contract: string
+    partyOne: string
+    partyTwo: string
+    expiresAt: Date | null
+    communicationChannels: CommunicationChannel[]
+    _count: CommunicationContractCountAggregateOutputType | null
+    _min: CommunicationContractMinAggregateOutputType | null
+    _max: CommunicationContractMaxAggregateOutputType | null
+  }
+
+  type GetCommunicationContractGroupByPayload<T extends CommunicationContractGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickArray<CommunicationContractGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof CommunicationContractGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], CommunicationContractGroupByOutputType[P]>
+            : GetScalarType<T[P], CommunicationContractGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type CommunicationContractSelect<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    contract?: boolean
+    partyOne?: boolean
+    partyTwo?: boolean
+    expiresAt?: boolean
+    communicationChannels?: boolean
+  }, ExtArgs["result"]["communicationContract"]>
+
+  export type CommunicationContractSelectScalar = {
+    id?: boolean
+    contract?: boolean
+    partyOne?: boolean
+    partyTwo?: boolean
+    expiresAt?: boolean
+    communicationChannels?: boolean
+  }
+
+
+  type CommunicationContractGetPayload<S extends boolean | null | undefined | CommunicationContractArgs> = $Types.GetResult<CommunicationContractPayload, S>
+
+  type CommunicationContractCountArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = 
+    Omit<CommunicationContractFindManyArgs, 'select' | 'include'> & {
+      select?: CommunicationContractCountAggregateInputType | true
+    }
+
+  export interface CommunicationContractDelegate<GlobalRejectSettings extends Prisma.RejectOnNotFound | Prisma.RejectPerOperation | false | undefined, ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['CommunicationContract'], meta: { name: 'CommunicationContract' } }
+    /**
+     * Find zero or one CommunicationContract that matches the filter.
+     * @param {CommunicationContractFindUniqueArgs} args - Arguments to find a CommunicationContract
+     * @example
+     * // Get one CommunicationContract
+     * const communicationContract = await prisma.communicationContract.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findUnique<T extends CommunicationContractFindUniqueArgs<ExtArgs>, LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
+      args: SelectSubset<T, CommunicationContractFindUniqueArgs<ExtArgs>>
+    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findUnique', 'CommunicationContract'> extends True ? Prisma__CommunicationContractClient<$Types.GetResult<CommunicationContractPayload<ExtArgs>, T, 'findUnique', never>, never, ExtArgs> : Prisma__CommunicationContractClient<$Types.GetResult<CommunicationContractPayload<ExtArgs>, T, 'findUnique', never> | null, null, ExtArgs>
+
+    /**
+     * Find one CommunicationContract that matches the filter or throw an error  with `error.code='P2025'` 
+     *     if no matches were found.
+     * @param {CommunicationContractFindUniqueOrThrowArgs} args - Arguments to find a CommunicationContract
+     * @example
+     * // Get one CommunicationContract
+     * const communicationContract = await prisma.communicationContract.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findUniqueOrThrow<T extends CommunicationContractFindUniqueOrThrowArgs<ExtArgs>>(
+      args?: SelectSubset<T, CommunicationContractFindUniqueOrThrowArgs<ExtArgs>>
+    ): Prisma__CommunicationContractClient<$Types.GetResult<CommunicationContractPayload<ExtArgs>, T, 'findUniqueOrThrow', never>, never, ExtArgs>
+
+    /**
+     * Find the first CommunicationContract that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CommunicationContractFindFirstArgs} args - Arguments to find a CommunicationContract
+     * @example
+     * // Get one CommunicationContract
+     * const communicationContract = await prisma.communicationContract.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findFirst<T extends CommunicationContractFindFirstArgs<ExtArgs>, LocalRejectSettings = T["rejectOnNotFound"] extends RejectOnNotFound ? T['rejectOnNotFound'] : undefined>(
+      args?: SelectSubset<T, CommunicationContractFindFirstArgs<ExtArgs>>
+    ): HasReject<GlobalRejectSettings, LocalRejectSettings, 'findFirst', 'CommunicationContract'> extends True ? Prisma__CommunicationContractClient<$Types.GetResult<CommunicationContractPayload<ExtArgs>, T, 'findFirst', never>, never, ExtArgs> : Prisma__CommunicationContractClient<$Types.GetResult<CommunicationContractPayload<ExtArgs>, T, 'findFirst', never> | null, null, ExtArgs>
+
+    /**
+     * Find the first CommunicationContract that matches the filter or
+     * throw `NotFoundError` if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CommunicationContractFindFirstOrThrowArgs} args - Arguments to find a CommunicationContract
+     * @example
+     * // Get one CommunicationContract
+     * const communicationContract = await prisma.communicationContract.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+    **/
+    findFirstOrThrow<T extends CommunicationContractFindFirstOrThrowArgs<ExtArgs>>(
+      args?: SelectSubset<T, CommunicationContractFindFirstOrThrowArgs<ExtArgs>>
+    ): Prisma__CommunicationContractClient<$Types.GetResult<CommunicationContractPayload<ExtArgs>, T, 'findFirstOrThrow', never>, never, ExtArgs>
+
+    /**
+     * Find zero or more CommunicationContracts that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CommunicationContractFindManyArgs=} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all CommunicationContracts
+     * const communicationContracts = await prisma.communicationContract.findMany()
+     * 
+     * // Get first 10 CommunicationContracts
+     * const communicationContracts = await prisma.communicationContract.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const communicationContractWithIdOnly = await prisma.communicationContract.findMany({ select: { id: true } })
+     * 
+    **/
+    findMany<T extends CommunicationContractFindManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, CommunicationContractFindManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<$Types.GetResult<CommunicationContractPayload<ExtArgs>, T, 'findMany', never>>
+
+    /**
+     * Create a CommunicationContract.
+     * @param {CommunicationContractCreateArgs} args - Arguments to create a CommunicationContract.
+     * @example
+     * // Create one CommunicationContract
+     * const CommunicationContract = await prisma.communicationContract.create({
+     *   data: {
+     *     // ... data to create a CommunicationContract
+     *   }
+     * })
+     * 
+    **/
+    create<T extends CommunicationContractCreateArgs<ExtArgs>>(
+      args: SelectSubset<T, CommunicationContractCreateArgs<ExtArgs>>
+    ): Prisma__CommunicationContractClient<$Types.GetResult<CommunicationContractPayload<ExtArgs>, T, 'create', never>, never, ExtArgs>
+
+    /**
+     * Create many CommunicationContracts.
+     *     @param {CommunicationContractCreateManyArgs} args - Arguments to create many CommunicationContracts.
+     *     @example
+     *     // Create many CommunicationContracts
+     *     const communicationContract = await prisma.communicationContract.createMany({
+     *       data: {
+     *         // ... provide data here
+     *       }
+     *     })
+     *     
+    **/
+    createMany<T extends CommunicationContractCreateManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, CommunicationContractCreateManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Delete a CommunicationContract.
+     * @param {CommunicationContractDeleteArgs} args - Arguments to delete one CommunicationContract.
+     * @example
+     * // Delete one CommunicationContract
+     * const CommunicationContract = await prisma.communicationContract.delete({
+     *   where: {
+     *     // ... filter to delete one CommunicationContract
+     *   }
+     * })
+     * 
+    **/
+    delete<T extends CommunicationContractDeleteArgs<ExtArgs>>(
+      args: SelectSubset<T, CommunicationContractDeleteArgs<ExtArgs>>
+    ): Prisma__CommunicationContractClient<$Types.GetResult<CommunicationContractPayload<ExtArgs>, T, 'delete', never>, never, ExtArgs>
+
+    /**
+     * Update one CommunicationContract.
+     * @param {CommunicationContractUpdateArgs} args - Arguments to update one CommunicationContract.
+     * @example
+     * // Update one CommunicationContract
+     * const communicationContract = await prisma.communicationContract.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+    **/
+    update<T extends CommunicationContractUpdateArgs<ExtArgs>>(
+      args: SelectSubset<T, CommunicationContractUpdateArgs<ExtArgs>>
+    ): Prisma__CommunicationContractClient<$Types.GetResult<CommunicationContractPayload<ExtArgs>, T, 'update', never>, never, ExtArgs>
+
+    /**
+     * Delete zero or more CommunicationContracts.
+     * @param {CommunicationContractDeleteManyArgs} args - Arguments to filter CommunicationContracts to delete.
+     * @example
+     * // Delete a few CommunicationContracts
+     * const { count } = await prisma.communicationContract.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+    **/
+    deleteMany<T extends CommunicationContractDeleteManyArgs<ExtArgs>>(
+      args?: SelectSubset<T, CommunicationContractDeleteManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more CommunicationContracts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CommunicationContractUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many CommunicationContracts
+     * const communicationContract = await prisma.communicationContract.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+    **/
+    updateMany<T extends CommunicationContractUpdateManyArgs<ExtArgs>>(
+      args: SelectSubset<T, CommunicationContractUpdateManyArgs<ExtArgs>>
+    ): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create or update one CommunicationContract.
+     * @param {CommunicationContractUpsertArgs} args - Arguments to update or create a CommunicationContract.
+     * @example
+     * // Update or create a CommunicationContract
+     * const communicationContract = await prisma.communicationContract.upsert({
+     *   create: {
+     *     // ... data to create a CommunicationContract
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the CommunicationContract we want to update
+     *   }
+     * })
+    **/
+    upsert<T extends CommunicationContractUpsertArgs<ExtArgs>>(
+      args: SelectSubset<T, CommunicationContractUpsertArgs<ExtArgs>>
+    ): Prisma__CommunicationContractClient<$Types.GetResult<CommunicationContractPayload<ExtArgs>, T, 'upsert', never>, never, ExtArgs>
+
+    /**
+     * Count the number of CommunicationContracts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CommunicationContractCountArgs} args - Arguments to filter CommunicationContracts to count.
+     * @example
+     * // Count the number of CommunicationContracts
+     * const count = await prisma.communicationContract.count({
+     *   where: {
+     *     // ... the filter for the CommunicationContracts we want to count
+     *   }
+     * })
+    **/
+    count<T extends CommunicationContractCountArgs>(
+      args?: Subset<T, CommunicationContractCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], CommunicationContractCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a CommunicationContract.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CommunicationContractAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends CommunicationContractAggregateArgs>(args: Subset<T, CommunicationContractAggregateArgs>): Prisma.PrismaPromise<GetCommunicationContractAggregateType<T>>
+
+    /**
+     * Group by CommunicationContract.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {CommunicationContractGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends CommunicationContractGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: CommunicationContractGroupByArgs['orderBy'] }
+        : { orderBy?: CommunicationContractGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends TupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, CommunicationContractGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetCommunicationContractGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for CommunicationContract.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export class Prisma__CommunicationContractClient<T, Null = never, ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> implements Prisma.PrismaPromise<T> {
+    private readonly _dmmf;
+    private readonly _queryType;
+    private readonly _rootField;
+    private readonly _clientMethod;
+    private readonly _args;
+    private readonly _dataPath;
+    private readonly _errorFormat;
+    private readonly _measurePerformance?;
+    private _isList;
+    private _callsite;
+    private _requestPromise?;
+    readonly [Symbol.toStringTag]: 'PrismaPromise';
+    constructor(_dmmf: runtime.DMMFClass, _queryType: 'query' | 'mutation', _rootField: string, _clientMethod: string, _args: any, _dataPath: string[], _errorFormat: ErrorFormat, _measurePerformance?: boolean | undefined, _isList?: boolean);
+
+
+    private get _document();
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): Promise<TResult1 | TResult2>;
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): Promise<T | TResult>;
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): Promise<T>;
+  }
+
+
+
+  // Custom InputTypes
+
+  /**
+   * CommunicationContract base type for findUnique actions
+   */
+  export type CommunicationContractFindUniqueArgsBase<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CommunicationContract
+     */
+    select?: CommunicationContractSelect<ExtArgs> | null
+    /**
+     * Filter, which CommunicationContract to fetch.
+     */
+    where: CommunicationContractWhereUniqueInput
+  }
+
+  /**
+   * CommunicationContract findUnique
+   */
+  export interface CommunicationContractFindUniqueArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> extends CommunicationContractFindUniqueArgsBase<ExtArgs> {
+   /**
+    * Throw an Error if query returns no results
+    * @deprecated since 4.0.0: use `findUniqueOrThrow` method instead
+    */
+    rejectOnNotFound?: RejectOnNotFound
+  }
+      
+
+  /**
+   * CommunicationContract findUniqueOrThrow
+   */
+  export type CommunicationContractFindUniqueOrThrowArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CommunicationContract
+     */
+    select?: CommunicationContractSelect<ExtArgs> | null
+    /**
+     * Filter, which CommunicationContract to fetch.
+     */
+    where: CommunicationContractWhereUniqueInput
+  }
+
+
+  /**
+   * CommunicationContract base type for findFirst actions
+   */
+  export type CommunicationContractFindFirstArgsBase<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CommunicationContract
+     */
+    select?: CommunicationContractSelect<ExtArgs> | null
+    /**
+     * Filter, which CommunicationContract to fetch.
+     */
+    where?: CommunicationContractWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CommunicationContracts to fetch.
+     */
+    orderBy?: Enumerable<CommunicationContractOrderByWithRelationInput>
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CommunicationContracts.
+     */
+    cursor?: CommunicationContractWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CommunicationContracts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CommunicationContracts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CommunicationContracts.
+     */
+    distinct?: Enumerable<CommunicationContractScalarFieldEnum>
+  }
+
+  /**
+   * CommunicationContract findFirst
+   */
+  export interface CommunicationContractFindFirstArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> extends CommunicationContractFindFirstArgsBase<ExtArgs> {
+   /**
+    * Throw an Error if query returns no results
+    * @deprecated since 4.0.0: use `findFirstOrThrow` method instead
+    */
+    rejectOnNotFound?: RejectOnNotFound
+  }
+      
+
+  /**
+   * CommunicationContract findFirstOrThrow
+   */
+  export type CommunicationContractFindFirstOrThrowArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CommunicationContract
+     */
+    select?: CommunicationContractSelect<ExtArgs> | null
+    /**
+     * Filter, which CommunicationContract to fetch.
+     */
+    where?: CommunicationContractWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CommunicationContracts to fetch.
+     */
+    orderBy?: Enumerable<CommunicationContractOrderByWithRelationInput>
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for CommunicationContracts.
+     */
+    cursor?: CommunicationContractWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CommunicationContracts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CommunicationContracts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of CommunicationContracts.
+     */
+    distinct?: Enumerable<CommunicationContractScalarFieldEnum>
+  }
+
+
+  /**
+   * CommunicationContract findMany
+   */
+  export type CommunicationContractFindManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CommunicationContract
+     */
+    select?: CommunicationContractSelect<ExtArgs> | null
+    /**
+     * Filter, which CommunicationContracts to fetch.
+     */
+    where?: CommunicationContractWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of CommunicationContracts to fetch.
+     */
+    orderBy?: Enumerable<CommunicationContractOrderByWithRelationInput>
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing CommunicationContracts.
+     */
+    cursor?: CommunicationContractWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` CommunicationContracts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` CommunicationContracts.
+     */
+    skip?: number
+    distinct?: Enumerable<CommunicationContractScalarFieldEnum>
+  }
+
+
+  /**
+   * CommunicationContract create
+   */
+  export type CommunicationContractCreateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CommunicationContract
+     */
+    select?: CommunicationContractSelect<ExtArgs> | null
+    /**
+     * The data needed to create a CommunicationContract.
+     */
+    data: XOR<CommunicationContractCreateInput, CommunicationContractUncheckedCreateInput>
+  }
+
+
+  /**
+   * CommunicationContract createMany
+   */
+  export type CommunicationContractCreateManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many CommunicationContracts.
+     */
+    data: Enumerable<CommunicationContractCreateManyInput>
+    skipDuplicates?: boolean
+  }
+
+
+  /**
+   * CommunicationContract update
+   */
+  export type CommunicationContractUpdateArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CommunicationContract
+     */
+    select?: CommunicationContractSelect<ExtArgs> | null
+    /**
+     * The data needed to update a CommunicationContract.
+     */
+    data: XOR<CommunicationContractUpdateInput, CommunicationContractUncheckedUpdateInput>
+    /**
+     * Choose, which CommunicationContract to update.
+     */
+    where: CommunicationContractWhereUniqueInput
+  }
+
+
+  /**
+   * CommunicationContract updateMany
+   */
+  export type CommunicationContractUpdateManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update CommunicationContracts.
+     */
+    data: XOR<CommunicationContractUpdateManyMutationInput, CommunicationContractUncheckedUpdateManyInput>
+    /**
+     * Filter which CommunicationContracts to update
+     */
+    where?: CommunicationContractWhereInput
+  }
+
+
+  /**
+   * CommunicationContract upsert
+   */
+  export type CommunicationContractUpsertArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CommunicationContract
+     */
+    select?: CommunicationContractSelect<ExtArgs> | null
+    /**
+     * The filter to search for the CommunicationContract to update in case it exists.
+     */
+    where: CommunicationContractWhereUniqueInput
+    /**
+     * In case the CommunicationContract found by the `where` argument doesn't exist, create a new CommunicationContract with this data.
+     */
+    create: XOR<CommunicationContractCreateInput, CommunicationContractUncheckedCreateInput>
+    /**
+     * In case the CommunicationContract was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<CommunicationContractUpdateInput, CommunicationContractUncheckedUpdateInput>
+  }
+
+
+  /**
+   * CommunicationContract delete
+   */
+  export type CommunicationContractDeleteArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CommunicationContract
+     */
+    select?: CommunicationContractSelect<ExtArgs> | null
+    /**
+     * Filter which CommunicationContract to delete.
+     */
+    where: CommunicationContractWhereUniqueInput
+  }
+
+
+  /**
+   * CommunicationContract deleteMany
+   */
+  export type CommunicationContractDeleteManyArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which CommunicationContracts to delete
+     */
+    where?: CommunicationContractWhereInput
+  }
+
+
+  /**
+   * CommunicationContract without action
+   */
+  export type CommunicationContractArgs<ExtArgs extends $Extensions.Args = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the CommunicationContract
+     */
+    select?: CommunicationContractSelect<ExtArgs> | null
+  }
+
+
+
+  /**
    * Enums
    */
 
@@ -2778,14 +2818,6 @@ export namespace Prisma {
   };
 
   export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof typeof TransactionIsolationLevel]
-
-
-  export const RegisteredIdentitiesScalarFieldEnum: {
-    did: 'did',
-    communicationChannels: 'communicationChannels'
-  };
-
-  export type RegisteredIdentitiesScalarFieldEnum = (typeof RegisteredIdentitiesScalarFieldEnum)[keyof typeof RegisteredIdentitiesScalarFieldEnum]
 
 
   export const EventLogScalarFieldEnum: {
@@ -2800,6 +2832,18 @@ export namespace Prisma {
   };
 
   export type EventLogScalarFieldEnum = (typeof EventLogScalarFieldEnum)[keyof typeof EventLogScalarFieldEnum]
+
+
+  export const CommunicationContractScalarFieldEnum: {
+    id: 'id',
+    contract: 'contract',
+    partyOne: 'partyOne',
+    partyTwo: 'partyTwo',
+    expiresAt: 'expiresAt',
+    communicationChannels: 'communicationChannels'
+  };
+
+  export type CommunicationContractScalarFieldEnum = (typeof CommunicationContractScalarFieldEnum)[keyof typeof CommunicationContractScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -2854,39 +2898,6 @@ export namespace Prisma {
    * Deep Input Types
    */
 
-
-  export type RegisteredIdentitiesWhereInput = {
-    AND?: Enumerable<RegisteredIdentitiesWhereInput>
-    OR?: Enumerable<RegisteredIdentitiesWhereInput>
-    NOT?: Enumerable<RegisteredIdentitiesWhereInput>
-    did?: StringFilter | string
-    communicationChannels?: EnumCommunicationChannelNullableListFilter
-  }
-
-  export type RegisteredIdentitiesOrderByWithRelationInput = {
-    did?: SortOrder
-    communicationChannels?: SortOrder
-  }
-
-  export type RegisteredIdentitiesWhereUniqueInput = {
-    did?: string
-  }
-
-  export type RegisteredIdentitiesOrderByWithAggregationInput = {
-    did?: SortOrder
-    communicationChannels?: SortOrder
-    _count?: RegisteredIdentitiesCountOrderByAggregateInput
-    _max?: RegisteredIdentitiesMaxOrderByAggregateInput
-    _min?: RegisteredIdentitiesMinOrderByAggregateInput
-  }
-
-  export type RegisteredIdentitiesScalarWhereWithAggregatesInput = {
-    AND?: Enumerable<RegisteredIdentitiesScalarWhereWithAggregatesInput>
-    OR?: Enumerable<RegisteredIdentitiesScalarWhereWithAggregatesInput>
-    NOT?: Enumerable<RegisteredIdentitiesScalarWhereWithAggregatesInput>
-    did?: StringWithAggregatesFilter | string
-    communicationChannels?: EnumCommunicationChannelNullableListFilter
-  }
 
   export type EventLogWhereInput = {
     AND?: Enumerable<EventLogWhereInput>
@@ -2945,39 +2956,53 @@ export namespace Prisma {
     metadata?: JsonNullableWithAggregatesFilter
   }
 
-  export type RegisteredIdentitiesCreateInput = {
-    did: string
-    communicationChannels?: RegisteredIdentitiesCreatecommunicationChannelsInput | Enumerable<CommunicationChannel>
+  export type CommunicationContractWhereInput = {
+    AND?: Enumerable<CommunicationContractWhereInput>
+    OR?: Enumerable<CommunicationContractWhereInput>
+    NOT?: Enumerable<CommunicationContractWhereInput>
+    id?: StringFilter | string
+    contract?: StringFilter | string
+    partyOne?: StringFilter | string
+    partyTwo?: StringFilter | string
+    expiresAt?: DateTimeNullableFilter | Date | string | null
+    communicationChannels?: EnumCommunicationChannelNullableListFilter
   }
 
-  export type RegisteredIdentitiesUncheckedCreateInput = {
-    did: string
-    communicationChannels?: RegisteredIdentitiesCreatecommunicationChannelsInput | Enumerable<CommunicationChannel>
+  export type CommunicationContractOrderByWithRelationInput = {
+    id?: SortOrder
+    contract?: SortOrder
+    partyOne?: SortOrder
+    partyTwo?: SortOrder
+    expiresAt?: SortOrderInput | SortOrder
+    communicationChannels?: SortOrder
   }
 
-  export type RegisteredIdentitiesUpdateInput = {
-    did?: StringFieldUpdateOperationsInput | string
-    communicationChannels?: RegisteredIdentitiesUpdatecommunicationChannelsInput | Enumerable<CommunicationChannel>
+  export type CommunicationContractWhereUniqueInput = {
+    id?: string
   }
 
-  export type RegisteredIdentitiesUncheckedUpdateInput = {
-    did?: StringFieldUpdateOperationsInput | string
-    communicationChannels?: RegisteredIdentitiesUpdatecommunicationChannelsInput | Enumerable<CommunicationChannel>
+  export type CommunicationContractOrderByWithAggregationInput = {
+    id?: SortOrder
+    contract?: SortOrder
+    partyOne?: SortOrder
+    partyTwo?: SortOrder
+    expiresAt?: SortOrderInput | SortOrder
+    communicationChannels?: SortOrder
+    _count?: CommunicationContractCountOrderByAggregateInput
+    _max?: CommunicationContractMaxOrderByAggregateInput
+    _min?: CommunicationContractMinOrderByAggregateInput
   }
 
-  export type RegisteredIdentitiesCreateManyInput = {
-    did: string
-    communicationChannels?: RegisteredIdentitiesCreatecommunicationChannelsInput | Enumerable<CommunicationChannel>
-  }
-
-  export type RegisteredIdentitiesUpdateManyMutationInput = {
-    did?: StringFieldUpdateOperationsInput | string
-    communicationChannels?: RegisteredIdentitiesUpdatecommunicationChannelsInput | Enumerable<CommunicationChannel>
-  }
-
-  export type RegisteredIdentitiesUncheckedUpdateManyInput = {
-    did?: StringFieldUpdateOperationsInput | string
-    communicationChannels?: RegisteredIdentitiesUpdatecommunicationChannelsInput | Enumerable<CommunicationChannel>
+  export type CommunicationContractScalarWhereWithAggregatesInput = {
+    AND?: Enumerable<CommunicationContractScalarWhereWithAggregatesInput>
+    OR?: Enumerable<CommunicationContractScalarWhereWithAggregatesInput>
+    NOT?: Enumerable<CommunicationContractScalarWhereWithAggregatesInput>
+    id?: StringWithAggregatesFilter | string
+    contract?: StringWithAggregatesFilter | string
+    partyOne?: StringWithAggregatesFilter | string
+    partyTwo?: StringWithAggregatesFilter | string
+    expiresAt?: DateTimeNullableWithAggregatesFilter | Date | string | null
+    communicationChannels?: EnumCommunicationChannelNullableListFilter
   }
 
   export type EventLogCreateInput = {
@@ -3057,6 +3082,69 @@ export namespace Prisma {
     metadata?: NullableJsonNullValueInput | InputJsonValue
   }
 
+  export type CommunicationContractCreateInput = {
+    id?: string
+    contract: string
+    partyOne: string
+    partyTwo: string
+    expiresAt?: Date | string | null
+    communicationChannels?: CommunicationContractCreatecommunicationChannelsInput | Enumerable<CommunicationChannel>
+  }
+
+  export type CommunicationContractUncheckedCreateInput = {
+    id?: string
+    contract: string
+    partyOne: string
+    partyTwo: string
+    expiresAt?: Date | string | null
+    communicationChannels?: CommunicationContractCreatecommunicationChannelsInput | Enumerable<CommunicationChannel>
+  }
+
+  export type CommunicationContractUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    contract?: StringFieldUpdateOperationsInput | string
+    partyOne?: StringFieldUpdateOperationsInput | string
+    partyTwo?: StringFieldUpdateOperationsInput | string
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    communicationChannels?: CommunicationContractUpdatecommunicationChannelsInput | Enumerable<CommunicationChannel>
+  }
+
+  export type CommunicationContractUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    contract?: StringFieldUpdateOperationsInput | string
+    partyOne?: StringFieldUpdateOperationsInput | string
+    partyTwo?: StringFieldUpdateOperationsInput | string
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    communicationChannels?: CommunicationContractUpdatecommunicationChannelsInput | Enumerable<CommunicationChannel>
+  }
+
+  export type CommunicationContractCreateManyInput = {
+    id?: string
+    contract: string
+    partyOne: string
+    partyTwo: string
+    expiresAt?: Date | string | null
+    communicationChannels?: CommunicationContractCreatecommunicationChannelsInput | Enumerable<CommunicationChannel>
+  }
+
+  export type CommunicationContractUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    contract?: StringFieldUpdateOperationsInput | string
+    partyOne?: StringFieldUpdateOperationsInput | string
+    partyTwo?: StringFieldUpdateOperationsInput | string
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    communicationChannels?: CommunicationContractUpdatecommunicationChannelsInput | Enumerable<CommunicationChannel>
+  }
+
+  export type CommunicationContractUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    contract?: StringFieldUpdateOperationsInput | string
+    partyOne?: StringFieldUpdateOperationsInput | string
+    partyTwo?: StringFieldUpdateOperationsInput | string
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    communicationChannels?: CommunicationContractUpdatecommunicationChannelsInput | Enumerable<CommunicationChannel>
+  }
+
   export type StringFilter = {
     equals?: string
     in?: Enumerable<string> | string
@@ -3070,45 +3158,6 @@ export namespace Prisma {
     endsWith?: string
     mode?: QueryMode
     not?: NestedStringFilter | string
-  }
-
-  export type EnumCommunicationChannelNullableListFilter = {
-    equals?: Enumerable<CommunicationChannel> | null
-    has?: CommunicationChannel | null
-    hasEvery?: Enumerable<CommunicationChannel>
-    hasSome?: Enumerable<CommunicationChannel>
-    isEmpty?: boolean
-  }
-
-  export type RegisteredIdentitiesCountOrderByAggregateInput = {
-    did?: SortOrder
-    communicationChannels?: SortOrder
-  }
-
-  export type RegisteredIdentitiesMaxOrderByAggregateInput = {
-    did?: SortOrder
-  }
-
-  export type RegisteredIdentitiesMinOrderByAggregateInput = {
-    did?: SortOrder
-  }
-
-  export type StringWithAggregatesFilter = {
-    equals?: string
-    in?: Enumerable<string> | string
-    notIn?: Enumerable<string> | string
-    lt?: string
-    lte?: string
-    gt?: string
-    gte?: string
-    contains?: string
-    startsWith?: string
-    endsWith?: string
-    mode?: QueryMode
-    not?: NestedStringWithAggregatesFilter | string
-    _count?: NestedIntFilter
-    _min?: NestedStringFilter
-    _max?: NestedStringFilter
   }
 
   export type EnumCommunicationChannelNullableFilter = {
@@ -3222,6 +3271,24 @@ export namespace Prisma {
     createdAt?: SortOrder
   }
 
+  export type StringWithAggregatesFilter = {
+    equals?: string
+    in?: Enumerable<string> | string
+    notIn?: Enumerable<string> | string
+    lt?: string
+    lte?: string
+    gt?: string
+    gte?: string
+    contains?: string
+    startsWith?: string
+    endsWith?: string
+    mode?: QueryMode
+    not?: NestedStringWithAggregatesFilter | string
+    _count?: NestedIntFilter
+    _min?: NestedStringFilter
+    _max?: NestedStringFilter
+  }
+
   export type EnumCommunicationChannelNullableWithAggregatesFilter = {
     equals?: CommunicationChannel | null
     in?: Enumerable<CommunicationChannel> | null
@@ -3314,17 +3381,66 @@ export namespace Prisma {
     _max?: NestedJsonNullableFilter
   }
 
-  export type RegisteredIdentitiesCreatecommunicationChannelsInput = {
-    set: Enumerable<CommunicationChannel>
+  export type DateTimeNullableFilter = {
+    equals?: Date | string | null
+    in?: Enumerable<Date> | Enumerable<string> | Date | string | null
+    notIn?: Enumerable<Date> | Enumerable<string> | Date | string | null
+    lt?: Date | string
+    lte?: Date | string
+    gt?: Date | string
+    gte?: Date | string
+    not?: NestedDateTimeNullableFilter | Date | string | null
+  }
+
+  export type EnumCommunicationChannelNullableListFilter = {
+    equals?: Enumerable<CommunicationChannel> | null
+    has?: CommunicationChannel | null
+    hasEvery?: Enumerable<CommunicationChannel>
+    hasSome?: Enumerable<CommunicationChannel>
+    isEmpty?: boolean
+  }
+
+  export type CommunicationContractCountOrderByAggregateInput = {
+    id?: SortOrder
+    contract?: SortOrder
+    partyOne?: SortOrder
+    partyTwo?: SortOrder
+    expiresAt?: SortOrder
+    communicationChannels?: SortOrder
+  }
+
+  export type CommunicationContractMaxOrderByAggregateInput = {
+    id?: SortOrder
+    contract?: SortOrder
+    partyOne?: SortOrder
+    partyTwo?: SortOrder
+    expiresAt?: SortOrder
+  }
+
+  export type CommunicationContractMinOrderByAggregateInput = {
+    id?: SortOrder
+    contract?: SortOrder
+    partyOne?: SortOrder
+    partyTwo?: SortOrder
+    expiresAt?: SortOrder
+  }
+
+  export type DateTimeNullableWithAggregatesFilter = {
+    equals?: Date | string | null
+    in?: Enumerable<Date> | Enumerable<string> | Date | string | null
+    notIn?: Enumerable<Date> | Enumerable<string> | Date | string | null
+    lt?: Date | string
+    lte?: Date | string
+    gt?: Date | string
+    gte?: Date | string
+    not?: NestedDateTimeNullableWithAggregatesFilter | Date | string | null
+    _count?: NestedIntNullableFilter
+    _min?: NestedDateTimeNullableFilter
+    _max?: NestedDateTimeNullableFilter
   }
 
   export type StringFieldUpdateOperationsInput = {
     set?: string
-  }
-
-  export type RegisteredIdentitiesUpdatecommunicationChannelsInput = {
-    set?: Enumerable<CommunicationChannel>
-    push?: Enumerable<CommunicationChannel>
   }
 
   export type NullableEnumCommunicationChannelFieldUpdateOperationsInput = {
@@ -3339,6 +3455,19 @@ export namespace Prisma {
     set?: Date | string
   }
 
+  export type CommunicationContractCreatecommunicationChannelsInput = {
+    set: Enumerable<CommunicationChannel>
+  }
+
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
+  }
+
+  export type CommunicationContractUpdatecommunicationChannelsInput = {
+    set?: Enumerable<CommunicationChannel>
+    push?: Enumerable<CommunicationChannel>
+  }
+
   export type NestedStringFilter = {
     equals?: string
     in?: Enumerable<string> | string
@@ -3351,34 +3480,6 @@ export namespace Prisma {
     startsWith?: string
     endsWith?: string
     not?: NestedStringFilter | string
-  }
-
-  export type NestedStringWithAggregatesFilter = {
-    equals?: string
-    in?: Enumerable<string> | string
-    notIn?: Enumerable<string> | string
-    lt?: string
-    lte?: string
-    gt?: string
-    gte?: string
-    contains?: string
-    startsWith?: string
-    endsWith?: string
-    not?: NestedStringWithAggregatesFilter | string
-    _count?: NestedIntFilter
-    _min?: NestedStringFilter
-    _max?: NestedStringFilter
-  }
-
-  export type NestedIntFilter = {
-    equals?: number
-    in?: Enumerable<number> | number
-    notIn?: Enumerable<number> | number
-    lt?: number
-    lte?: number
-    gt?: number
-    gte?: number
-    not?: NestedIntFilter | number
   }
 
   export type NestedEnumCommunicationChannelNullableFilter = {
@@ -3411,6 +3512,34 @@ export namespace Prisma {
     gt?: Date | string
     gte?: Date | string
     not?: NestedDateTimeFilter | Date | string
+  }
+
+  export type NestedStringWithAggregatesFilter = {
+    equals?: string
+    in?: Enumerable<string> | string
+    notIn?: Enumerable<string> | string
+    lt?: string
+    lte?: string
+    gt?: string
+    gte?: string
+    contains?: string
+    startsWith?: string
+    endsWith?: string
+    not?: NestedStringWithAggregatesFilter | string
+    _count?: NestedIntFilter
+    _min?: NestedStringFilter
+    _max?: NestedStringFilter
+  }
+
+  export type NestedIntFilter = {
+    equals?: number
+    in?: Enumerable<number> | number
+    notIn?: Enumerable<number> | number
+    lt?: number
+    lte?: number
+    gt?: number
+    gte?: number
+    not?: NestedIntFilter | number
   }
 
   export type NestedEnumCommunicationChannelNullableWithAggregatesFilter = {
@@ -3507,6 +3636,31 @@ export namespace Prisma {
     gt?: InputJsonValue
     gte?: InputJsonValue
     not?: InputJsonValue | JsonNullValueFilter
+  }
+
+  export type NestedDateTimeNullableFilter = {
+    equals?: Date | string | null
+    in?: Enumerable<Date> | Enumerable<string> | Date | string | null
+    notIn?: Enumerable<Date> | Enumerable<string> | Date | string | null
+    lt?: Date | string
+    lte?: Date | string
+    gt?: Date | string
+    gte?: Date | string
+    not?: NestedDateTimeNullableFilter | Date | string | null
+  }
+
+  export type NestedDateTimeNullableWithAggregatesFilter = {
+    equals?: Date | string | null
+    in?: Enumerable<Date> | Enumerable<string> | Date | string | null
+    notIn?: Enumerable<Date> | Enumerable<string> | Date | string | null
+    lt?: Date | string
+    lte?: Date | string
+    gt?: Date | string
+    gte?: Date | string
+    not?: NestedDateTimeNullableWithAggregatesFilter | Date | string | null
+    _count?: NestedIntNullableFilter
+    _min?: NestedDateTimeNullableFilter
+    _max?: NestedDateTimeNullableFilter
   }
 
 

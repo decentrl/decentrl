@@ -5,6 +5,8 @@ export interface DidKeyPair {
   public: JWK & { kid: string };
 }
 
+export type DidKey = JWK & { kid: string }
+
 export interface DidData {
   did: string;
   keys: {

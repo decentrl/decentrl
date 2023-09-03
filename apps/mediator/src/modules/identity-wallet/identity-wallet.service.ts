@@ -1,13 +1,14 @@
 import * as jose from '@decentrl/jose';
 import { ConfigService } from '@microservice-stack/nest-config';
 import {
+  DidData,
   DidDocument,
   DidDocumentBuilder,
   DidDocumentVerificationMethodType,
+  DidKey,
   MediatorCommunicationChannel,
   MediatorCommunicationContractService,
   MediatorCommunicationService,
-  MediatorRegisterService,
   MediatorServiceType,
 } from '@decentrl/utils/common';
 import { Injectable } from '@nestjs/common';
@@ -21,20 +22,16 @@ export class IdentityWalletService {
     const domain: string = this.configService.get(ConfigVariables.DOMAIN);
 
     const keyAgreementX25519Jwk = this.configService.get<jose.JWK>(
-      ConfigVariables.KEY_AGREEMENT_ECDH_PUBLIC_JWK
+      ConfigVariables.KEY_AGREEMENT_X25519_PUBLIC_JWK
+    );
+
+    const verificationEd25519Jwk = this.configService.get<jose.JWK>(
+      ConfigVariables.VERIFICATION_ED25519_PUBLIC_JWK
     );
 
     const did = `did:web:${domain}`;
-    const keyAgreementX25519JwkId = `${did}#key-ECDH-1`;
-
-    const mediatorRegisterService: MediatorRegisterService = {
-      id: `${did}#mediatorRegister`,
-      type: `DecentrlMediator${MediatorServiceType.REGISTER}`,
-      serviceEndpoint: {
-        uri: `ws://${domain}/`,
-        routingKeys: [keyAgreementX25519JwkId],
-      },
-    };
+    const keyAgreementX25519JwkId = `${did}#x25519`;
+    const verificationEd25519JwkId = `${did}#ed25519`;
 
     const MediatorCommunicationContractService: MediatorCommunicationContractService =
       {
@@ -68,23 +65,56 @@ export class IdentityWalletService {
         publicKeyJwk: keyAgreementX25519Jwk,
         controller: did,
       })
-      .addServiceEndpoint(mediatorRegisterService)
+      .addVerificationMethod({
+        id: verificationEd25519JwkId,
+        type: DidDocumentVerificationMethodType.JsonWebKey2020,
+        publicKeyJwk: verificationEd25519Jwk,
+        controller: did,
+      })
       .addServiceEndpoint(MediatorCommunicationContractService)
       .addServiceEndpoint(mediatorCommunicationService)
       .build();
   }
 
   getEncryptionKeyPair(): {
-    private: jose.JWK;
-    public: jose.JWK;
+    private: DidKey;
+    public: DidKey;
   } {
     return {
-      private: this.configService.get<jose.JWK>(
-        ConfigVariables.KEY_AGREEMENT_ECDH_PRIVATE_JWK
+      private: this.configService.get<DidKey>(
+        ConfigVariables.KEY_AGREEMENT_X25519_PRIVATE_JWK
       ),
-      public: this.configService.get<jose.JWK>(
-        ConfigVariables.KEY_AGREEMENT_ECDH_PUBLIC_JWK
+      public: this.configService.get<DidKey>(
+        ConfigVariables.KEY_AGREEMENT_X25519_PUBLIC_JWK
       ),
+    };
+  }
+
+  getSigningKeyPair(): {
+    private: DidKey;
+    public: DidKey;
+  } {
+    return {
+      private: this.configService.get<DidKey>(
+        ConfigVariables.VERIFICATION_ED25519_PRIVATE_JWK
+      ),
+      public: this.configService.get<DidKey>(
+        ConfigVariables.VERIFICATION_ED25519_PUBLIC_JWK
+      ),
+    };
+  }
+
+  getDidData(): DidData {
+    const didDocument = this.getDidDocument();
+    const encryptionKeyPair = this.getEncryptionKeyPair();
+    const signingKeyPair = this.getSigningKeyPair();
+
+    return {
+      did: didDocument.id,
+      keys: {
+        encryptionKeyPair,
+        signingKeyPair,
+      },
     };
   }
 }

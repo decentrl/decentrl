@@ -30,7 +30,7 @@ export const createNestApplication = async (
 export const createWebsocketClient = async (
   clientUrl: string
 ): Promise<WebSocket> => {
-  const client = new WebSocket(`ws://${clientUrl}`);
+  const client = new WebSocket(`wss://${clientUrl}`);
 
 
   client.on('error', (error) => console.log(error));

@@ -105,11 +105,6 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
-exports.Prisma.RegisteredIdentitiesScalarFieldEnum = {
-  did: 'did',
-  communicationChannels: 'communicationChannels'
-};
-
 exports.Prisma.EventLogScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -119,6 +114,15 @@ exports.Prisma.EventLogScalarFieldEnum = {
   payload: 'payload',
   createdAt: 'createdAt',
   metadata: 'metadata'
+};
+
+exports.Prisma.CommunicationContractScalarFieldEnum = {
+  id: 'id',
+  contract: 'contract',
+  partyOne: 'partyOne',
+  partyTwo: 'partyTwo',
+  expiresAt: 'expiresAt',
+  communicationChannels: 'communicationChannels'
 };
 
 exports.Prisma.SortOrder = {
@@ -157,8 +161,8 @@ exports.CommunicationChannel = {
 };
 
 exports.Prisma.ModelName = {
-  RegisteredIdentities: 'RegisteredIdentities',
-  EventLog: 'EventLog'
+  EventLog: 'EventLog',
+  CommunicationContract: 'CommunicationContract'
 };
 
 /**

@@ -1,6 +1,7 @@
 /* eslint-disable @nx/enforce-module-boundaries */
 import * as nodeUtils from '@decentrl/utils/node';
 import {
+  CommunicationContractSignatureResult,
   Cryptography,
   DidDocumentBuilder,
   MediatorCommandType,
@@ -59,7 +60,11 @@ describe('Register on mediator', () => {
   beforeAll(async () => {
     mediatorApplication = await createNestApplication(
       MediatorAppModule,
-      process.env.MEDIATOR_PORT as any
+      process.env.MEDIATOR_PORT as any,
+      {
+        key: fs.readFileSync('e2e/src/secrets/registry/key.pem'),
+        cert: fs.readFileSync('e2e/src/secrets/registry/cert.pem'),
+      }
     );
     registryApplication = await createNestApplication(
       RegistryAppModule,
@@ -205,10 +210,10 @@ describe('Register on mediator', () => {
     );
   });
 
-  let signedCommunicationContract: string;
+  let communicationContractSignatureResult: CommunicationContractSignatureResult;
 
   it('identity two should sign the communication contract request and send it back to identity one', async () => {
-    signedCommunicationContract = await signCommunicationContract(
+    communicationContractSignatureResult = await signCommunicationContract(
       signedCommunicationContractRequest,
       identityTwo[0],
       Cryptography.NODE
@@ -220,7 +225,7 @@ describe('Register on mediator', () => {
           name: MediatorCommandType.SIGN_COMMUNICATION_CONTACT,
           recipient: identityOne[0].did,
           payload: {
-            contract: signedCommunicationContract,
+            contract: communicationContractSignatureResult.signature,
           },
         },
         identityTwo[0],
@@ -278,7 +283,7 @@ describe('Register on mediator', () => {
           id: expect.any(String),
           name: MediatorCommandType.SIGN_COMMUNICATION_CONTACT,
           payload: {
-            contract: signedCommunicationContract,
+            contract: communicationContractSignatureResult.signature,
           },
           sender: identityTwo[0].did,
           recipient: identityOne[0].did,
@@ -312,7 +317,7 @@ describe('Register on mediator', () => {
           recipient: identityTwo[0].did,
           payload: {
             message: encryptedMessage,
-            signedCommunicationContract,
+            contract: communicationContractSignatureResult.signature,
           },
         },
         identityOne[0],
@@ -327,10 +332,7 @@ describe('Register on mediator', () => {
       })
     );
 
-    const mediatorResponse: any = await listenToMediatorEvent(
-      identityOne[0],
-      websocketClient
-    );
+    await listenToMediatorEvent(identityOne[0], websocketClient);
   });
 
   it('identity two should query mediator for private messages', async () => {
@@ -371,9 +373,9 @@ describe('Register on mediator', () => {
   });
 
   afterAll(async () => {
-    await mediatorApplication.close();
-    await registryApplication.close();
+    mediatorApplication.close();
+    registryApplication.close();
 
     websocketClient.close();
-  }, 1000);
+  });
 });

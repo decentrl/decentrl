@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import {
   Cryptography,
   DidDocument,
@@ -14,7 +14,6 @@ import {
   MediatorMessageType,
   MediatorOneWayPublicCommandPayload,
   MediatorQueryCommandPayload,
-  MediatorRegisterCommandPayload,
   MediatorRequestCommunicationContractCommandPayload,
   MediatorSignCommunicationContractCommandPayload,
   MediatorTwoWayPrivateCommandPayload,
@@ -22,7 +21,6 @@ import {
   getVerificationMethods,
 } from '@decentrl/utils/common';
 import { UtilsService } from '../utils/utils.service';
-import { RegisterService } from '../register/register.service';
 import { ConfigService } from '@microservice-stack/nest-config';
 import { ConfigVariables } from '../../constants';
 import { MediatorError } from '../../errors/mediator.error';
@@ -32,18 +30,19 @@ import { CommunicationContractService } from '../communication-contract/communic
 import { EventLogService } from '../event-log/event-log.service';
 import { OneWayPublicService } from '../one-way-public/one-way-public.service';
 import { TwoWayPrivateService } from '../two-way-private/two-way-private.service';
+import { AuthenticationService } from '../authentication/authentication.service';
 
 @Injectable()
 export class WebsocketService {
   constructor(
     private utilService: UtilsService,
-    private registerService: RegisterService,
     private communicationContractService: CommunicationContractService,
     private eventLogService: EventLogService,
     private configService: ConfigService,
     private identityWalletService: IdentityWalletService,
     private oneWayPublicService: OneWayPublicService,
-    private twoWayPrivateService: TwoWayPrivateService
+    private twoWayPrivateService: TwoWayPrivateService,
+    private authenticationService: AuthenticationService
   ) {}
 
   async processCommand(
@@ -53,11 +52,10 @@ export class WebsocketService {
     senderDidDocument: DidDocument
   ): Promise<MediatorEventPayload | void> {
     switch (type) {
-      case MediatorCommandType.REGISTER:
-        return await this.registerService.registerIdentity({
-          didDocument: senderDidDocument,
-          command: commandPayload as MediatorRegisterCommandPayload,
-        });
+      case MediatorCommandType.REQUEST_AUTHENTICATION_CHALLENGE:
+        return await this.authenticationService.requestAuthenticationChallenge(
+          senderDidDocument
+        );
       case MediatorCommandType.REQUEST_COMMUNICATION_CONTRACT:
         return await this.communicationContractService.requestCommunicationContract(
           command,
@@ -121,6 +119,7 @@ export class WebsocketService {
         senderDidDocument
       );
 
+
       const senderEncryptionKeys = getVerificationMethods(
         senderDidDocument,
         'keyAgreement',
@@ -134,7 +133,9 @@ export class WebsocketService {
       const encryptedPayload = await encryptPayload(
         JSON.stringify(mediatorEventPayload),
         Cryptography.NODE,
-        this.configService.get(ConfigVariables.KEY_AGREEMENT_ECDH_PRIVATE_JWK),
+        this.configService.get(
+          ConfigVariables.KEY_AGREEMENT_X25519_PRIVATE_JWK
+        ),
         senderEncryptionKeys[0].publicKeyJwk,
         (
           this.identityWalletService.getDidDocument()
@@ -149,6 +150,7 @@ export class WebsocketService {
       };
     } catch (error) {
       return {
+        id: command.id,
         type: MediatorMessageType.ERROR,
         reason: error.message,
       };

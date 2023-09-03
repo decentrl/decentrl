@@ -3,6 +3,7 @@ import { EventLogService } from '../event-log/event-log.service';
 import {
   Cryptography,
   MediatorCommand,
+  MediatorCommunicationChannel,
   MediatorErrorReason,
   MediatorEventPayload,
   MediatorEventType,
@@ -11,12 +12,14 @@ import {
 import { InternalMediatorCommand } from '../../interfaces';
 import { verifyCommunicationContract } from '@decentrl/utils/common';
 import { MediatorError } from '../../errors/mediator.error';
-
-// todo: decrease payload sizes
+import { CommunicationContractService } from '../communication-contract/communication-contract.service';
 
 @Injectable()
 export class TwoWayPrivateService {
-  constructor(private eventLogService: EventLogService) {}
+  constructor(
+    private eventLogService: EventLogService,
+    private communicationContractService: CommunicationContractService
+  ) {}
 
   async postTwoWayPrivateMessage(
     command: MediatorCommand,
@@ -25,16 +28,36 @@ export class TwoWayPrivateService {
       command: commandPayload,
     }: InternalMediatorCommand<MediatorTwoWayPrivateCommandPayload>
   ): Promise<MediatorEventPayload> {
-    try {
-      await this.verifyCommunicationContract(
-        commandPayload.payload.signedCommunicationContract,
-        didDocument.id,
-        commandPayload.recipient
+    const mediatorCommunicationContract =
+      await this.communicationContractService.verifyCommunicationContract(
+        commandPayload.recipient,
+        [MediatorCommunicationChannel.TWO_WAY_PRIVATE]
       );
-    } catch {
+
+    if (!mediatorCommunicationContract) {
       throw new MediatorError(
-        MediatorErrorReason.COMMUNICATION_CONTRACT_NOT_VALID
+        MediatorErrorReason.RECIPIENT_COMMUNICATION_CHANNEL_NOT_ENABLED
       );
+    }
+
+    const senderCommunicationContract =
+      await this.communicationContractService.getCommunicationContract(
+        commandPayload.recipient,
+        didDocument.id
+      );
+
+    if (!senderCommunicationContract) {
+      if (commandPayload.payload.contract) {
+        await this.verifyCommunicationContract(
+          commandPayload.payload.contract,
+          didDocument.id,
+          commandPayload.recipient
+        );
+      } else {
+        throw new MediatorError(
+          MediatorErrorReason.COMMUNICATION_CONTRACT_NOT_VALID
+        );
+      }
     }
 
     await this.eventLogService.insertCommand(

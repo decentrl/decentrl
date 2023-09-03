@@ -14,11 +14,6 @@ enum CommunicationChannel {
   GROUP_PRIVATE
 }
 
-model RegisteredIdentities {
-  did                   String                 @id @unique
-  communicationChannels CommunicationChannel[]
-}
-
 model EventLog {
   id        String   @id @default(uuid())
   name      String
@@ -28,4 +23,16 @@ model EventLog {
   payload   Json
   createdAt DateTime @default(now())
   metadata  Json?
+}
+
+model CommunicationContract {
+  id        String   @id @default(uuid())
+  contract  String
+  partyOne String
+  partyTwo String
+  expiresAt DateTime?
+  communicationChannels CommunicationChannel[] @default([])
+
+  @@index(partyOne)
+  @@index(partyTwo)
 }

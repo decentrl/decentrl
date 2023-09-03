@@ -41,7 +41,7 @@ export class EventLogService {
         offset,
         orderBy,
         sender,
-        receiver,
+        recipient: receiver,
         gte,
         lte,
         metadata,
