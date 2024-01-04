@@ -1,0 +1,23 @@
+FROM node:18 as build
+
+WORKDIR /service
+
+COPY / /service/
+
+RUN npm ci
+RUN npx nx prisma-generate mediator
+RUN npx nx build mediator
+# COPY node_modules/ /service/node_modules
+# COPY package-lock.json package.json /service/
+# COPY dist/apps/mediator/ /service/
+# COPY apps/mediator/prisma/ /service/
+# COPY apps/mediator/src/prisma-client/ /Users/lukafurlan/Documents/decentrl/decentrl/apps/mediator/src/prisma-client/
+
+USER root
+
+WORKDIR /service
+
+EXPOSE 8080
+
+# CMD [ "node", "main.js" ]
+CMD ["/bin/sh", "-c", "npx prisma migrate deploy; node main.js"]

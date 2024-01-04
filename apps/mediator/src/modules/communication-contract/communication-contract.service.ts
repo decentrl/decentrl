@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { EventLogService } from '../event-log/event-log.service';
 import { InternalMediatorCommand } from '../../interfaces';
 import {

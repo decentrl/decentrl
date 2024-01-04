@@ -13,12 +13,9 @@ import { DidData } from '../did/did.interfaces';
 import {
   MediatorCommand,
   MediatorCommandPayload,
-  MediatorCommunicationChannel,
-  MediatorCommunicationService,
   MediatorEvent,
   MediatorEventPayload,
   MediatorMessageType,
-  MediatorServiceType,
 } from './mediator.interfaces';
 import { v4 } from 'uuid';
 
@@ -74,19 +71,3 @@ export const readMediatorEventPayload = async <T extends MediatorEventPayload>(
 
   return JSON.parse(verificationResult.decryptedPayload) as T;
 };
-
-export function getMediatorCommunicationChannels(
-  didDocument: DidDocument
-): MediatorCommunicationChannel[] {
-  const communicationService = didDocument.service.find(
-    (service) =>
-      service.type === `DecentrlMediator${MediatorServiceType.COMMUNICATION}`
-  );
-
-  if (!communicationService) {
-    return [];
-  }
-
-  return (communicationService as MediatorCommunicationService).serviceEndpoint
-    .communicationChannels;
-}

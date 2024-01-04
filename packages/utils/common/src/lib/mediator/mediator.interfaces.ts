@@ -1,45 +1,4 @@
-export enum MediatorCommunicationChannel {
-  ONE_WAY_PUBLIC = 'ONE_WAY_PUBLIC',
-  TWO_WAY_PRIVATE = 'TWO_WAY_PRIVATE',
-  GROUP_PRIVATE = 'GROUP_PRIVATE',
-}
-
-export enum MediatorServiceType {
-  COMMUNICATION_CONTRACT = 'CommunicationContract',
-  COMMUNICATION = 'Communication',
-  BACKLIST = 'Blacklist',
-  DISCOVERY = 'Discovery',
-}
-
-export interface MediatorService {
-  id: string;
-  type: `DecentrlMediator${MediatorServiceType}`;
-  serviceEndpoint:
-    | MediatorServiceEndpoint
-    | MediatorCommunicationServiceEndpoint;
-}
-
-export interface MediatorServiceEndpoint {
-  uri: string;
-  routingKeys: string[];
-}
-
-export interface MediatorCommunicationServiceEndpoint
-  extends MediatorServiceEndpoint {
-  communicationChannels: MediatorCommunicationChannel[];
-}
-
-export interface MediatorCommunicationContractService {
-  id: string;
-  type: `DecentrlMediator${MediatorServiceType.COMMUNICATION_CONTRACT}`;
-  serviceEndpoint: MediatorServiceEndpoint;
-}
-
-export interface MediatorCommunicationService {
-  id: string;
-  type: `DecentrlMediator${MediatorServiceType.COMMUNICATION}`;
-  serviceEndpoint: MediatorCommunicationServiceEndpoint;
-}
+import { MediatorCommunicationChannel } from "../mediator-did-document/mediator-did-document.interfaces";
 
 export enum MediatorMessageType {
   COMMAND = 'COMMAND',
@@ -86,6 +45,10 @@ export enum MediatorEventType {
   // Messaging
   ONE_WAY_PUBLIC_MESSAGE_SENT = 'ONE_WAY_PUBLIC_MESSAGE_SENT',
   TWO_WAY_PRIVATE_MESSAGE_SENT = 'TWO_WAY_PRIVATE_MESSAGE_SENT',
+  // Group
+  REGISTER_GROUP = 'REGISTER_GROUP',
+  UPDATE_GROUP = 'UPDATE_GROUP',
+  DELETE_GROUP = 'DELETE_GROUP',
 }
 
 export interface MediatorEventPayload {
@@ -471,7 +434,7 @@ export interface UpdateChatMediatorPayload {
 /**
  * Group private
  *
- * Group is a peer did that has its own mediators. Mediator has the peer did registered internally because of validation.
+ * Group is a "peer" did that has its own mediators. Mediator has the "peer" did registered internally because of validation.
  * The group did contains admin key that is used to sign messages that can update the "public" group peer did that
  * is registered on the mediator. When a group is created, group peer did is sent to group participants via the two way private
  * communication channel. Group admin must have a connection contract established with the group participants in order to send them
